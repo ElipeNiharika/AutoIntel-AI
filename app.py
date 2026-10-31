@@ -15,11 +15,12 @@ if ROOT not in sys.path:
 from backend.app import app
 
 if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
     print("=" * 80)
     print(">>> STARTING AI VEHICLE SERVICE, REPAIR & INSURANCE INTELLIGENCE PLATFORM <<<")
     print("=" * 80)
-    print("Access the web application at: http://127.0.0.1:5000")
+    print(f"Access the web application on port {port}")
     print("Default Admin: admin@autointel.ai / Admin@123")
     print("Default User:  technician@autointel.ai / Technician@123")
     print("=" * 80)
-    app.run(debug=False, host="127.0.0.1", port=5000)
+    app.run(debug=False, host="0.0.0.0", port=port)

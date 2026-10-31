@@ -126,8 +126,11 @@ class PartsRecommendation(Base):
 
 
 def get_db_url():
-    if os.environ.get("MYSQL_URL"):
-        return os.environ.get("MYSQL_URL")
+    db_url = os.environ.get("DATABASE_URL") or os.environ.get("DATABASE_URI") or os.environ.get("MYSQL_URL")
+    if db_url:
+        if db_url.startswith("postgres://"):
+            db_url = db_url.replace("postgres://", "postgresql://", 1)
+        return db_url
     
     host = os.environ.get("MYSQL_HOST")
     user = os.environ.get("MYSQL_USER")
@@ -147,10 +150,13 @@ def get_db_url():
 
 _default_url = get_db_url()
 try:
-    engine = create_engine(_default_url, pool_pre_ping=True)
+    if "sqlite" in _default_url:
+        engine = create_engine(_default_url, connect_args={"check_same_thread": False})
+    else:
+        engine = create_engine(_default_url, pool_pre_ping=True)
     with engine.connect() as conn:
         pass
-except Exception:
+except Exception as e:
     root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
     db_path = os.path.join(root_dir, "database", "ai_vehicle_service.db")
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
