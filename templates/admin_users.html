@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Manage Users - AutoIntel AI Admin{% endblock %}
+{% block page_title %}Manage Users & Roles (Admin){% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">👥 Manage <span>User Accounts</span> & Roles</h1>
+    <p class="page-subtitle">Real-time registered users, fleet asset ownership, and role authorizations from MySQL database.</p>
+  </div>
+  <a href="{{ url_for('admin_dashboard_page') }}" class="btn btn-secondary">&larr; Back to Dashboard</a>
+</div>
+
+<div class="glass-card" style="padding: 0;">
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>User ID</th>
+          <th>Full Name</th>
+          <th>Email Address</th>
+          <th>Role</th>
+          <th>Registration Date</th>
+          <th>Vehicles Owned</th>
+          <th>Analyses Count</th>
+          <th>Account Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if users_data %}
+          {% for u in users_data %}
+            <tr>
+              <td><strong style="color: var(--accent-purple);">#{{ u.user.id }}</strong></td>
+              <td><strong>{{ u.user.name }}</strong></td>
+              <td>{{ u.user.email }}</td>
+              <td>
+                {% if u.user.role == 'admin' %}
+                  <span class="badge badge-neon">Administrator</span>
+                {% else %}
+                  <span class="badge badge-success">Registered User</span>
+                {% endif %}
+              </td>
+              <td>{{ u.user.created_at.strftime('%Y-%m-%d %H:%M') if u.user.created_at else 'N/A' }}</td>
+              <td><strong style="color: #38bdf8;">{{ u.vehicle_count }} vehicles</strong></td>
+              <td><strong style="color: var(--accent-purple);">{{ u.analysis_count }} checks</strong></td>
+              <td><span style="color: var(--accent-emerald); font-weight: 600;">● Active</span></td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-muted);">No users found in database.</td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

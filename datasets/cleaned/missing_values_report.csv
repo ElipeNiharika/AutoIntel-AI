@@ -1,0 +1,68 @@
+,missing_count
+Service ID,0
+Vehicle Type,0
+Make and Model,0
+Service Type,0
+Service Description,0
+Repair Date,0
+Towing Date,102691
+Tow Location,102691
+Drop-off Location,102691
+Parts Used,0
+Total Cost,0
+Payment Method,0
+Warranty Information,0
+Service Status,0
+Customer Feedback,120000
+Follow-up Needed,0
+Urgency Level,0
+Customer Type,0
+Service Duration Hours,0
+Estimated Cost,0
+Mileage at Service,0
+Insurance Claim Used,0
+Technician Rating,0
+Tow Distance Miles,0
+Is Warranty Valid,0
+Insurance Claim Used_flag,0
+Is Warranty Valid_flag,0
+Follow-up Needed_flag,0
+Days_Between_Tow_and_Repair,0
+Repair_Month,0
+Repair_Weekday,0
+Brand,0
+Model,0
+Parts_Clean,0
+Parts_Count,0
+part_brake_pads,0
+part_oil_filter,0
+part_battery,0
+part_spark_plugs,0
+part_air_filter,0
+part_alternator,0
+part_radiator,0
+part_starter_motor,0
+part_transmission_fluid,0
+part_clutch_plate,0
+part_timing_belt,0
+part_water_pump,0
+part_struts,0
+part_brake_rotor,0
+part_fuel_pump,0
+part_oxygen_sensor,0
+part_tires,0
+part_headlight_bulb,0
+part_cabin_filter,0
+part_wiper_blades,0
+Service_Desc_Len,0
+desc_has_engine,0
+desc_has_transmission,0
+desc_has_brake,0
+desc_has_battery,0
+desc_has_electrical,0
+desc_has_oil,0
+desc_has_clutch,0
+desc_has_suspension,0
+desc_has_towing,0
+desc_has_overheating,0
+cost_overrun_ratio,0

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}My Vehicles - AutoIntel AI{% endblock %}
+{% block page_title %}My Registered Vehicles{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">🚗 My <span>Vehicles</span> & Fleet Profile</h1>
+    <p class="page-subtitle">Manage your registered vehicles, edit odometer readings, or launch instant AI service checks.</p>
+  </div>
+  <a href="{{ url_for('add_vehicle_page') }}" class="btn btn-neon">+ Add New Vehicle</a>
+</div>
+
+{% if user_vehicles and user_vehicles|length > 0 %}
+  <div class="grid-3" style="margin-bottom: 2rem;">
+    {% for v in user_vehicles %}
+      <div class="glass-card glass-card-neon-top" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+            <div>
+              <span class="badge badge-neon" style="font-size: 0.7rem;">{{ v.vehicle_type }}</span>
+              <h3 style="font-size: 1.25rem; font-weight: 800; color: #fff; margin-top: 0.3rem;">{{ v.brand }} {{ v.model }}</h3>
+            </div>
+            <span style="font-size: 1.5rem;">🚘</span>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+            <div>📅 Year: <strong style="color: #fff;">{{ v.manufacturing_year }}</strong></div>
+            <div>⚡ Fuel / Power: <strong style="color: #fff;">{{ v.fuel_type }} ({{ v.transmission }})</strong></div>
+            <div>🛣️ Odometer: <strong style="color: var(--accent-emerald);">{{ "{:,}".format(v.mileage) }} miles</strong></div>
+          </div>
+        </div>
+
+        <div>
+          <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+            <a href="{{ url_for('edit_vehicle_page', vehicle_id=v.id) }}" class="btn btn-secondary" style="flex: 1; font-size: 0.8rem; padding: 0.45rem;">✏️ Edit</a>
+            <a href="{{ url_for('delete_vehicle_action', vehicle_id=v.id) }}" onclick="return confirm('Are you sure you want to remove this vehicle from your profile?')" class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.45rem; color: var(--accent-rose);">🗑️ Delete</a>
+          </div>
+          <a href="{{ url_for('check_page') }}" class="btn btn-neon btn-block" style="font-size: 0.85rem; padding: 0.6rem;">
+            <span>✨ Start AI Check</span>
+          </a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="glass-card" style="text-align: center; padding: 3.5rem 2rem; margin-bottom: 2rem;">
+    <div style="font-size: 3rem; margin-bottom: 1rem;">🚗</div>
+    <h3 style="font-size: 1.3rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem;">No Vehicles Registered Yet</h3>
+    <p style="color: var(--text-secondary); max-width: 460px; margin: 0 auto 1.5rem auto; font-size: 0.9rem;">
+      Add your car or fleet vehicle to your profile to enable 1-click health checks, maintenance forecasting, and service scheduling.
+    </p>
+    <a href="{{ url_for('add_vehicle_page') }}" class="btn btn-neon" style="padding: 0.8rem 2rem;">+ Add Your First Vehicle</a>
+  </div>
+{% endif %}
+{% endblock %}

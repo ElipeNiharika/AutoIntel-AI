@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Export Reports - AutoIntel AI Admin{% endblock %}
+{% block page_title %}Executive Audit & Reports Export{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">📄 Export <span>Executive Reports</span> & Telemetry</h1>
+    <p class="page-subtitle">Download official CSV audit spreadsheets and formatted landscape PDF reports directly from MySQL database.</p>
+  </div>
+  <a href="{{ url_for('admin_dashboard_page') }}" class="btn btn-secondary">&larr; Back to Admin Dashboard</a>
+</div>
+
+<div class="grid-2">
+  <!-- PDF Report Card -->
+  <div class="glass-card glass-card-neon-top" style="display: flex; flex-direction: column; justify-content: space-between;">
+    <div>
+      <div style="font-size: 2.2rem; margin-bottom: 0.75rem;">📑</div>
+      <h3 style="font-size: 1.25rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem;">Executive Landscape PDF Report</h3>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5; margin-bottom: 1.25rem;">
+        Generate a publication-ready PDF document including service timestamps, customer vehicle profiles, predicted costs, turnaround hours, insurance claim feasibility, and severity ratings.
+      </p>
+      <ul style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem; padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.35rem;">
+        <li>&bull; Formatted with ReportLab landscape grid</li>
+        <li>&bull; Color-coded headers and severity ratings</li>
+        <li>&bull; Ideal for project viva demonstrations and stakeholder presentations</li>
+      </ul>
+    </div>
+    <a href="{{ url_for('export_pdf') }}" class="btn btn-neon btn-block" style="padding: 0.85rem;">
+      <span>📑 Download Executive PDF Report</span>
+    </a>
+  </div>
+
+  <!-- CSV Report Card -->
+  <div class="glass-card glass-card-neon-top" style="display: flex; flex-direction: column; justify-content: space-between;">
+    <div>
+      <div style="font-size: 2.2rem; margin-bottom: 0.75rem;">📥</div>
+      <h3 style="font-size: 1.25rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem;">Raw CSV Audit Spreadsheet</h3>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5; margin-bottom: 1.25rem;">
+        Export all recorded vehicle inferences, problem classifications, and parts recommendations into a comma-separated format compatible with Excel and Pandas.
+      </p>
+      <ul style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem; padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.35rem;">
+        <li>&bull; Full column headers matching MySQL schema</li>
+        <li>&bull; UTF-8 encoded with standard comma delimiters</li>
+        <li>&bull; Suitable for post-hoc exploratory data analytics</li>
+      </ul>
+    </div>
+    <a href="{{ url_for('export_csv') }}" class="btn btn-secondary btn-block" style="padding: 0.85rem;">
+      <span>📥 Download Raw CSV Spreadsheet</span>
+    </a>
+  </div>
+</div>
+{% endblock %}

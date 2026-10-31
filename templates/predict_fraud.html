@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block title %}Insurance Fraud Detection - AutoIntel AI{% endblock %}
+{% block page_title %}Dedicated Insurance Fraud Detection (Dataset 3: fraud_oracle.csv){% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">🛡️ Dedicated <span>Insurance Fraud</span> Detection Engine</h1>
+    <p class="page-subtitle">Dataset 3 Machine Learning Engine: Calibrated Cost-Sensitive XGBoost Classifier ($0.8308$ ROC-AUC) detecting deceptive policy claims</p>
+  </div>
+</div>
+
+<form id="fraudForm">
+  <div class="grid-2">
+    <!-- Policy & Driver Information -->
+    <div class="glass-card glass-card-neon-top">
+      <h3 style="font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">
+        👤 Policyholder & Vehicle Attributes
+      </h3>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Vehicle Make</label>
+          <select name="make" class="form-control" required>
+            <option value="Toyota">Toyota</option>
+            <option value="Honda">Honda</option>
+            <option value="Ford">Ford</option>
+            <option value="BMW">BMW</option>
+            <option value="Mercedes-Benz">Mercedes-Benz</option>
+            <option value="Mazda">Mazda</option>
+            <option value="Pontiac">Pontiac</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Driver Age</label>
+          <input type="number" name="age" class="form-control" value="38" min="16" max="99" required>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Policy Type</label>
+          <select name="policy_type" class="form-control">
+            <option value="Sedan - All Perils">Sedan - All Perils</option>
+            <option value="Sedan - Collision">Sedan - Collision</option>
+            <option value="Sedan - Liability">Sedan - Liability</option>
+            <option value="Sport - All Perils">Sport - All Perils</option>
+            <option value="Utility - All Perils">Utility - All Perils</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Policy Deductible ($)</label>
+          <select name="deductible" class="form-control">
+            <option value="300">300</option>
+            <option value="400">400</option>
+            <option value="500" selected>500</option>
+            <option value="700">700</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Driver Historical Rating</label>
+          <select name="driver_rating" class="form-control">
+            <option value="1">1 (Highest Risk)</option>
+            <option value="2">2 (Moderate Risk)</option>
+            <option value="3" selected>3 (Standard Rating)</option>
+            <option value="4">4 (Preferred Driver)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Accident Area</label>
+          <select name="accident_area" class="form-control">
+            <option value="Urban" selected>Urban</option>
+            <option value="Rural">Rural</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Claim Risk Indicators -->
+    <div class="glass-card glass-card-neon-top">
+      <h3 style="font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">
+        🚨 Claim Telemetry & Fault Attribution
+      </h3>
+
+      <div class="form-group">
+        <label class="form-label">Incident Fault Designation</label>
+        <select name="fault" class="form-control" required>
+          <option value="Policy Holder" selected>Policy Holder (Single Vehicle / At Fault)</option>
+          <option value="Third Party">Third Party (Other Driver At Fault)</option>
+        </select>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Official Police Report Filed?</label>
+          <select name="police_report" class="form-control">
+            <option value="No" selected>No</option>
+            <option value="Yes">Yes</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Independent Witness Present?</label>
+          <select name="witness" class="form-control">
+            <option value="No" selected>No</option>
+            <option value="Yes">Yes</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="background: rgba(221, 39, 245, 0.08); padding: 0.9rem; border-radius: 8px; border-left: 3px solid var(--accent-neon); margin-bottom: 1.25rem;">
+        <p style="font-size: 0.8rem; color: #cbd5e1;">
+          💡 <strong>Domain Distinction:</strong> Insurance Claim Prediction (Dataset 1) forecasts repair coverage feasibility, while this Fraud Model (Dataset 3) evaluates suspicious policy claim behavior.
+        </p>
+      </div>
+
+      <button type="submit" id="btnSubmitFraud" class="btn btn-neon btn-block" style="padding: 0.85rem;">
+        <span>🛡️ Audit Claim for Fraud Indicators</span>
+      </button>
+    </div>
+  </div>
+</form>
+
+<!-- Fraud Audit Result Card -->
+<div id="fraudResultBox" class="result-box">
+  <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.25rem;">
+    <div>
+      <span class="badge badge-neon">Fraud Audit Analysis Generated</span>
+      <h2 style="font-size: 1.4rem; font-weight: 800; color: #fff; margin-top: 0.25rem;">Insurance Fraud Risk Assessment</h2>
+    </div>
+    <div style="font-size: 0.8rem; color: var(--text-muted);">
+      Engine: <strong id="resModelName" style="color: var(--accent-neon);">XGBoost Classifier</strong>
+    </div>
+  </div>
+
+  <div class="grid-3">
+    <div class="glass-card" style="text-align: center; border-color: var(--border-glow);">
+      <p style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">Fraud Risk Level</p>
+      <div style="margin: 0.75rem 0;">
+        <span id="resFraudBadge" class="badge badge-success" style="font-size: 1.1rem; padding: 0.5rem 1.2rem;">Low / Genuine</span>
+      </div>
+      <p style="font-size: 0.8rem; color: #a1a1aa;">Risk-adjusted threshold rating</p>
+    </div>
+
+    <div class="glass-card" style="text-align: center;">
+      <p style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">Fraud Probability Score</p>
+      <div id="resFraudProb" class="metric-highlight" style="font-size: 2.5rem; margin: 0.4rem 0;">0.0%</div>
+      <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden; margin-top: 0.5rem;">
+        <div id="resFraudBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #DD27F5, #f43f5e); transition: width 0.6s ease-in-out;"></div>
+      </div>
+    </div>
+
+    <div class="glass-card" style="text-align: center;">
+      <p style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">Recommended Claim Action</p>
+      <div style="font-size: 1.1rem; font-weight: 700; color: #fff; margin: 0.75rem 0;">Standard Underwriting Flow</div>
+      <p style="font-size: 0.8rem; color: var(--text-muted);">No manual Special Investigation Unit (SIU) escalation required</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

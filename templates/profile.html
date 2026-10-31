@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}My Profile - AutoIntel AI{% endblock %}
+{% block page_title %}Operator Profile{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">👤 My <span>Account</span> & Profile</h1>
+    <p class="page-subtitle">View your operator profile details, registered fleet assets, and account security.</p>
+  </div>
+</div>
+
+<div class="grid-2">
+  <!-- Profile Summary -->
+  <div class="glass-card glass-card-neon-top">
+    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+      <div class="user-avatar" style="width: 54px; height: 54px; font-size: 1.4rem;">
+        {{ session.get('user_name', 'U')[0]|upper }}
+      </div>
+      <div>
+        <h2 style="font-size: 1.3rem; font-weight: 800; color: #fff;">{{ session.get('user_name') }}</h2>
+        <p style="color: var(--text-muted); font-size: 0.85rem;">{{ session.get('user_email') }}</p>
+        <div style="margin-top: 0.35rem;">
+          {% if session.get('user_role') == 'admin' %}
+            <span class="badge badge-neon">Fleet Administrator</span>
+          {% else %}
+            <span class="badge badge-success">Verified Vehicle Owner</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border-color); padding-top: 1.25rem; font-size: 0.9rem;">
+      <div style="display: flex; justify-content: space-between;">
+        <span style="color: var(--text-muted);">Account ID:</span>
+        <strong style="color: #fff;">#{{ session.get('user_id') }}</strong>
+      </div>
+      <div style="display: flex; justify-content: space-between;">
+        <span style="color: var(--text-muted);">Platform Access:</span>
+        <strong style="color: var(--accent-emerald);">Full AI Service Suite</strong>
+      </div>
+      <div style="display: flex; justify-content: space-between;">
+        <span style="color: var(--text-muted);">Database Persistence:</span>
+        <strong style="color: #fff;">MySQL Normalized Relational</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="glass-card glass-card-neon-top">
+    <h3 style="font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 1rem;">
+      ⚡ Quick Management Actions
+    </h3>
+
+    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+      <a href="{{ url_for('check_page') }}" class="btn btn-neon" style="justify-content: flex-start; padding: 0.85rem 1.2rem;">
+        <span>✨ Start New Vehicle Health Check</span>
+      </a>
+      <a href="{{ url_for('add_vehicle_page') }}" class="btn btn-secondary" style="justify-content: flex-start; padding: 0.85rem 1.2rem;">
+        <span>🚗 Add Another Vehicle to Profile</span>
+      </a>
+      <a href="{{ url_for('history_page') }}" class="btn btn-secondary" style="justify-content: flex-start; padding: 0.85rem 1.2rem;">
+        <span>📋 View My Complete Service History</span>
+      </a>
+      <a href="{{ url_for('logout') }}" class="btn btn-secondary" style="justify-content: flex-start; padding: 0.85rem 1.2rem; color: var(--accent-rose);">
+        <span>🚪 Sign Out of Platform</span>
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

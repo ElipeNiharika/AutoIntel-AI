@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Register Vehicle - AutoIntel AI{% endblock %}
+{% block page_title %}Register Vehicle (Module 2 Intake){% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">🚘 Register <span>New Vehicle</span> to Profile</h1>
+    <p class="page-subtitle">Add vehicle assets to your fleet profile for automated service workorders and predictive telemetry</p>
+  </div>
+  <a href="{{ url_for('vehicles_page') }}" class="btn btn-secondary">&larr; Back to Catalog</a>
+</div>
+
+<div style="max-width: 760px; margin: 1rem auto;">
+  <div class="glass-card glass-card-neon-top">
+    <form method="POST" action="{{ url_for('add_vehicle_page') }}">
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Brand / Make</label>
+          <select name="brand" id="brandSelect" class="form-control" required>
+            <option value="">-- Select Brand --</option>
+            {% for b in metadata.get('brands', ['Toyota', 'Honda', 'Ford', 'BMW', 'Mercedes-Benz', 'Hyundai', 'Nissan', 'Chevrolet']) %}
+              <option value="{{ b }}">{{ b }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Vehicle Model</label>
+          <select name="model" id="modelSelect" class="form-control" required>
+            <option value="">-- Select Brand First --</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <div class="form-group">
+          <label class="form-label">Body / Vehicle Type</label>
+          <select name="vehicle_type" class="form-control" required>
+            {% for vt in metadata.get('vehicle_types', ['Sedan', 'SUV', 'Truck', 'Coupe', 'Hatchback']) %}
+              <option value="{{ vt }}">{{ vt }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Fuel Type</label>
+          <select name="fuel_type" class="form-control">
+            {% for ft in metadata.get('fuel_types', ['Petrol', 'Diesel', 'Electric', 'Hybrid', 'CNG']) %}
+              <option value="{{ ft }}">{{ ft }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Transmission</label>
+          <select name="transmission" class="form-control">
+            <option value="Automatic">Automatic</option>
+            <option value="Manual">Manual</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Manufacturing Year</label>
+          <input type="number" name="manufacturing_year" class="form-control" value="2021" min="1990" max="2026" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Current Odometer Mileage (Miles)</label>
+          <input type="number" name="mileage" class="form-control" value="28000" min="0" required>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-neon btn-block" style="padding: 0.9rem; margin-top: 1rem;">
+        <span>🚘 Save Vehicle to Database</span>
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

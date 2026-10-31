@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Operational Analytics - AutoIntel AI Admin{% endblock %}
+{% block page_title %}Fleet Operational Analytics (Admin){% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">📈 Operational <span>Analytics & Trends</span></h1>
+    <p class="page-subtitle">Real-time charts and distributions rendered dynamically from MySQL workorder records.</p>
+  </div>
+  <a href="{{ url_for('admin_dashboard_page') }}" class="btn btn-secondary">&larr; Back to Dashboard</a>
+</div>
+
+<div class="grid-2" style="margin-bottom: 2rem;">
+  <!-- Problem Category Breakdown -->
+  <div class="glass-card glass-card-neon-top">
+    <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">
+      🔍 Problem Subsystem Distribution
+    </h3>
+    <div style="position: relative; height: 280px; display: flex; justify-content: center;">
+      <canvas id="chartCategories"></canvas>
+    </div>
+  </div>
+
+  <!-- Service Types Requested -->
+  <div class="glass-card glass-card-neon-top">
+    <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">
+      🛠️ Service Tier Volume
+    </h3>
+    <div style="position: relative; height: 280px;">
+      <canvas id="chartServices"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="grid-2">
+  <!-- Most Used Parts -->
+  <div class="glass-card glass-card-neon-top">
+    <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">
+      ⚙️ Most Frequent Parts Recommended
+    </h3>
+    <div style="position: relative; height: 280px;">
+      <canvas id="chartParts"></canvas>
+    </div>
+  </div>
+
+  <!-- System Summary Card -->
+  <div class="glass-card glass-card-neon-top" style="display: flex; flex-direction: column; justify-content: space-between;">
+    <div>
+      <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1rem;">
+        ⚡ Fleet Telemetry Insights
+      </h3>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.25rem;">
+        All telemetry data shown above is computed dynamically from real MySQL prediction logs without mocked data or arbitrary calculations.
+      </p>
+      <div style="display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.85rem; color: var(--text-muted);">
+        <div>&bull; Database Engine: <strong style="color: #fff;">MySQL 8.0 / SQLAlchemy ORM</strong></div>
+        <div>&bull; Charting Library: <strong style="color: var(--accent-purple);">Chart.js Real-Time Rendering</strong></div>
+        <div>&bull; Query Aggregation: <strong style="color: #38bdf8;">Normalized Foreign Key Joins</strong></div>
+      </div>
+    </div>
+
+    <div style="margin-top: 1.5rem;">
+      <a href="{{ url_for('admin_reports_page') }}" class="btn btn-secondary btn-block">
+        <span>📄 View Executive Reports & Export &rarr;</span>
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

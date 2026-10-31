@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}AI Vehicle Diagnostic Agent - AutoIntel AI{% endblock %}
+{% block page_title %}Diagnostic Agent & Parts Recommendation (Modules 7 & 8){% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">🔍 Intelligent <span>Vehicle Diagnostic</span> & Parts Agent</h1>
+    <p class="page-subtitle">Modules 7 & 8: NLP TF-IDF Classification paired with an Industrial Rules Matrix for Problem & Parts Resolution (90.9% Acc)</p>
+  </div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 1.75rem;">
+  <!-- Input Form -->
+  <div class="glass-card glass-card-neon-top">
+    <h3 style="font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+      <span>🛠️</span> <span>Symptom & Diagnostic Intake</span>
+    </h3>
+
+    <form id="diagnoseForm">
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Vehicle Brand</label>
+          <input type="text" name="brand" class="form-control" value="Toyota" placeholder="e.g. Toyota, Honda, Ford">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Vehicle Model</label>
+          <input type="text" name="model" class="form-control" value="Corolla" placeholder="e.g. Corolla, Civic, F-150">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Problem Description / Symptoms</label>
+        <textarea name="problem_description" id="diagProblemDesc" class="form-control" rows="3" placeholder="e.g. Headlights flicker and battery drainage when idling..." required>Headlights flicker and battery light illuminates on dashboard</textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">OBD-II / ECU Diagnostic Code (Optional)</label>
+        <input type="text" name="ecu_data" class="form-control" placeholder="e.g. P0300, P0420, B1000, or leave blank">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Prior Service / Maintenance History</label>
+        <input type="text" name="service_history" class="form-control" placeholder="e.g. Battery replaced 2 years ago, oil changed last month" value="Alternator inspected 1 year ago">
+      </div>
+
+      <div style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem; flex-wrap: wrap;">
+        <span style="font-size: 0.75rem; color: var(--text-muted); width: 100%;">Sample Diagnostic Scenarios:</span>
+        <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;" onclick="document.getElementById('diagProblemDesc').value='Squeaking noise when braking and vibrating pedal';">Brake Squeak</button>
+        <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;" onclick="document.getElementById('diagProblemDesc').value='Engine overheating in traffic and coolant leak detected';">Cooling Leak</button>
+        <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;" onclick="document.getElementById('diagProblemDesc').value='Transmission slipping when shifting from 2nd to 3rd gear';">Transmission Slip</button>
+      </div>
+
+      <button type="submit" id="btnSubmitDiag" class="btn btn-neon btn-block" style="padding: 0.85rem;">
+        <span>🔍 Run AI Diagnostic & Parts Recommendation</span>
+      </button>
+    </form>
+  </div>
+
+  <!-- Output Results Panel -->
+  <div class="glass-card glass-card-neon-top" id="diagResultBox">
+    <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <span class="badge badge-neon">Module 7: Vehicle Diagnosis</span>
+        <h2 id="diagCategory" style="font-size: 1.5rem; font-weight: 800; color: #fff; margin-top: 0.3rem;">Electrical System</h2>
+      </div>
+      <div>
+        <span id="diagSeverity" class="badge badge-warning" style="font-size: 0.8rem; padding: 0.35rem 0.8rem;">Medium Severity</span>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 1.25rem;">
+      <p style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">Probable Root Cause Diagnosis</p>
+      <p id="diagName" style="color: #fff; font-size: 1.05rem; font-weight: 600; margin-top: 0.25rem;">Loose or Damaged Wiring / Alternator Voltage Drop</p>
+    </div>
+
+    <div style="margin-bottom: 1.25rem;">
+      <p style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">Recommended Technician Fix</p>
+      <p id="diagFix" style="color: #fff; font-size: 0.9rem; line-height: 1.5; margin-top: 0.25rem; background: rgba(221, 39, 245, 0.08); padding: 0.75rem 1rem; border-radius: 8px; border-left: 3px solid var(--accent-neon);">
+        Check and repair loose or damaged wiring connections and inspect alternator diodes.
+      </p>
+    </div>
+
+    <!-- Module 8: Parts Recommendation -->
+    <div style="border-top: 1px solid var(--border-color); padding-top: 1.25rem;">
+      <span class="badge badge-neon">Module 8: Parts Recommendation</span>
+      <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin: 0.5rem 0 1rem 0;">Itemized Part Action Plan</h3>
+
+      <div class="grid-2">
+        <div style="background: rgba(244,63,94,0.06); padding: 1rem; border-radius: 8px; border: 1px solid rgba(244,63,94,0.2);">
+          <h4 style="color: var(--accent-rose); font-size: 0.8rem; text-transform: uppercase; font-weight: 700; margin-bottom: 0.5rem;">🔴 Recommended Replacements</h4>
+          <ul id="diagReplaceParts" style="list-style: none; font-size: 0.85rem; color: #cbd5e1; display: flex; flex-direction: column; gap: 0.4rem;">
+            <li><strong>Replace:</strong> New OEM Wiring Harness / Battery Clamp</li>
+          </ul>
+        </div>
+
+        <div style="background: rgba(16,185,129,0.06); padding: 1rem; border-radius: 8px; border: 1px solid rgba(16,185,129,0.2);">
+          <h4 style="color: var(--accent-emerald); font-size: 0.8rem; text-transform: uppercase; font-weight: 700; margin-bottom: 0.5rem;">🟢 Recommended Repairs</h4>
+          <ul id="diagRepairActions" style="list-style: none; font-size: 0.85rem; color: #cbd5e1; display: flex; flex-direction: column; gap: 0.4rem;">
+            <li><strong>Action:</strong> Check and repair wiring, tighten ground contacts</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

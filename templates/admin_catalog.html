@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Vehicle Catalog - AutoIntel AI Admin{% endblock %}
+{% block page_title %}Vehicle Catalog & Dropdown Metadata (Admin){% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">🚗 Vehicle <span>Catalog</span> (Dataset 2 Reference)</h1>
+    <p class="page-subtitle">Verified automotive makes, models, and powertrain specifications indexed in the platform database.</p>
+  </div>
+  <a href="{{ url_for('admin_dashboard_page') }}" class="btn btn-secondary">&larr; Back to Admin Dashboard</a>
+</div>
+
+<div class="glass-card" style="margin-bottom: 1.5rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <span class="badge badge-neon">Dataset 2 Reference</span>
+      <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-top: 0.25rem;">Supported Manufacturers & Vehicle Models</h3>
+    </div>
+    <span style="font-size: 0.82rem; color: var(--text-muted);">{{ metadata.get('brands', [])|length }} Verified Brands</span>
+  </div>
+</div>
+
+<div class="glass-card" style="padding: 0;">
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Manufacturer Brand</th>
+          <th>Available Models in Catalog</th>
+          <th>Available Fuel Types</th>
+          <th>Transmissions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for brand, models in metadata.get('brand_models', {}).items() %}
+          <tr>
+            <td><strong style="color: var(--accent-purple); font-size: 0.95rem;">{{ brand }}</strong></td>
+            <td>
+              <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
+                {% for m in models[:8] %}
+                  <span style="background: rgba(255,255,255,0.06); padding: 0.2rem 0.55rem; border-radius: 4px; font-size: 0.75rem; color: #e4e4e7;">{{ m }}</span>
+                {% endfor %}
+              </div>
+            </td>
+            <td><span style="color: #34d399; font-size: 0.82rem;">Petrol, Diesel, Hybrid, Electric</span></td>
+            <td><span style="color: var(--text-secondary); font-size: 0.82rem;">Automatic, Manual</span></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

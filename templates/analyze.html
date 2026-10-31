@@ -1,0 +1,654 @@
+{% extends "base.html" %}
+{% block title %}Vehicle Check - AutoIntel AI{% endblock %}
+{% block page_title %}New Vehicle Check & AI Analysis{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">✨ Smart <span>Vehicle Check</span></h1>
+    <p class="page-subtitle">Fill in your vehicle and service details to get instant AI predictions for repair cost, turnaround time, insurance, and recommended parts.</p>
+  </div>
+  <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+    <button type="button" class="btn btn-secondary" onclick="fillScenario('brake')">💡 Scenario: Brake Noise</button>
+    <button type="button" class="btn btn-secondary" onclick="fillScenario('engine')">💡 Scenario: Engine Check</button>
+    <button type="button" class="btn btn-secondary" onclick="fillScenario('transmission')">💡 Scenario: Transmission</button>
+  </div>
+</div>
+
+<form id="vehicleCheckForm">
+  <!-- Vertically Stacked Single-Column Layout: Section 1 on Top, Section 2 Directly Below -->
+  <div style="display: flex; flex-direction: column; gap: 1.75rem;">
+    
+    <!-- Section 1: YOUR VEHICLE -->
+    <div class="glass-card glass-card-neon-top">
+      <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+        <span>🚗</span> <span>Section 1: YOUR VEHICLE</span>
+      </h3>
+
+      {% if user_vehicles and user_vehicles|length > 0 %}
+        <div class="form-group" style="background: rgba(221, 39, 245, 0.08); padding: 0.85rem; border-radius: 8px; border: 1px solid rgba(221, 39, 245, 0.2); margin-bottom: 1.25rem;">
+          <label class="form-label" style="color: var(--accent-purple);">Quick Select from My Saved Vehicles</label>
+          <select id="savedVehicleSelect" class="form-control" onchange="loadSavedVehicle(this)">
+            <option value="">-- Or enter new vehicle below --</option>
+            {% for uv in user_vehicles %}
+              <option value="{{ uv.id }}" data-brand="{{ uv.brand }}" data-model="{{ uv.model }}" data-type="{{ uv.vehicle_type }}" data-mileage="{{ uv.mileage }}" data-fuel="{{ uv.fuel_type }}" data-trans="{{ uv.transmission }}" data-year="{{ uv.manufacturing_year }}">
+                {{ uv.brand }} {{ uv.model }} ({{ uv.manufacturing_year }} &bull; {{ uv.vehicle_type }})
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+      {% endif %}
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Brand / Manufacturer</label>
+          <select name="brand" id="brandSelect" class="form-control" required>
+            <option value="">-- Select Brand --</option>
+            {% for b in metadata.get('brands', ['Toyota', 'Honda', 'Ford', 'BMW', 'Mercedes-Benz', 'Hyundai', 'Nissan', 'Chevrolet']) %}
+              <option value="{{ b }}">{{ b }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Vehicle Model</label>
+          <select name="model" id="modelSelect" class="form-control" required>
+            <option value="">-- Select Brand First --</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Vehicle Type</label>
+          <select name="vehicle_type" id="vehicleType" class="form-control">
+            <option value="Sedan">Sedan</option>
+            <option value="SUV">SUV</option>
+            <option value="Truck">Truck</option>
+            <option value="Hatchback">Hatchback</option>
+            <option value="Coupe">Coupe</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Fuel Type</label>
+          <select name="fuel_type" id="fuelType" class="form-control">
+            <option value="Petrol">Petrol</option>
+            <option value="Diesel">Diesel</option>
+            <option value="Hybrid">Hybrid</option>
+            <option value="Electric">Electric</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <div class="form-group">
+          <label class="form-label">Transmission</label>
+          <select name="transmission" id="transmission" class="form-control">
+            <option value="Automatic">Automatic</option>
+            <option value="Manual">Manual</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Manufacturing Year</label>
+          <input type="number" name="manufacturing_year" id="mfgYear" class="form-control" value="2021" min="1995" max="2026">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Mileage (Miles)</label>
+          <input type="number" name="mileage" id="mileage" class="form-control" value="38000" min="0" required>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: SERVICE DETAILS (Positioned directly below Section 1) -->
+    <div class="glass-card glass-card-neon-top">
+      <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+        <span>🔧</span> <span>Section 2: SERVICE DETAILS</span>
+      </h3>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Service Type</label>
+          <select name="service_type" id="serviceType" class="form-control">
+            <option value="Routine Maintenance">Routine Maintenance</option>
+            <option value="Brake System Service">Brake System Service</option>
+            <option value="Engine Diagnostics & Tune-up">Engine Diagnostics & Tune-up</option>
+            <option value="Transmission Repair">Transmission Repair</option>
+            <option value="Emergency Towing & Repair">Emergency Towing & Repair</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Urgency Priority</label>
+          <select name="urgency_level" id="urgencyLevel" class="form-control">
+            <option value="Low">Low (Routine Checkup)</option>
+            <option value="Normal" selected>Normal Priority</option>
+            <option value="High">High Priority</option>
+            <option value="Critical Emergency">Critical Emergency</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Problem Description (Plain English)</label>
+        <textarea name="problem_description" id="problemDescription" class="form-control" rows="2" placeholder="e.g. Squeaking noise when pressing brakes, pedal vibrates, engine misfire, check engine light..." required></textarea>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Estimated Cost ($)</label>
+          <input type="number" step="0.01" name="estimated_cost" id="estimatedCost" class="form-control" value="250.00">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Warranty Status</label>
+          <select name="warranty_info" id="warrantyInfo" class="form-control">
+            <option value="Standard Factory Warranty">Standard Factory Warranty</option>
+            <option value="Extended Coverage">Extended Coverage</option>
+            <option value="Expired / No Warranty">Expired / No Warranty</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Customer Type</label>
+          <select name="customer_type" id="customerType" class="form-control">
+            <option value="Individual Owner">Individual Owner</option>
+            <option value="Commercial Fleet">Commercial Fleet</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Technician Rating (1-5)</label>
+          <input type="number" step="0.1" min="1" max="5" name="technician_rating" id="techRating" class="form-control" value="4.8">
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Tow Distance (Miles, if any)</label>
+          <input type="number" step="0.1" name="tow_distance" id="towDistance" class="form-control" value="0.0">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">OBD Error Code (Optional)</label>
+          <input type="text" name="ecu_data" id="ecuData" class="form-control" placeholder="e.g. P0300, B1000">
+          <span style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-top: 0.25rem;">Enter the code shown by your vehicle scanner, if available.</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Parts Suspected / Used (Optional)</label>
+        <input type="text" name="parts_used" id="partsUsed" class="form-control" value="" placeholder="e.g. spark plugs, brake pads, oil filter">
+      </div>
+
+      <button type="submit" id="btnAnalyzeVehicle" class="btn btn-neon btn-block" style="padding: 0.95rem; font-size: 1rem; margin-top: 0.75rem;">
+        <span>✨ ANALYZE MY VEHICLE</span>
+      </button>
+    </div>
+
+  </div>
+</form>
+
+<!-- Professional Loading Spinner -->
+<div id="aiLoadingIndicator" style="display: none; text-align: center; padding: 2.5rem; margin-top: 1.5rem;">
+  <div class="pulse-dot" style="width: 24px; height: 24px; margin: 0 auto 1rem auto; background: var(--accent-purple); box-shadow: 0 0 16px var(--accent-purple);"></div>
+  <h3 style="font-size: 1.2rem; font-weight: 700; color: #fff;">Analyzing your vehicle...</h3>
+  <p style="color: var(--text-muted); font-size: 0.85rem;">Running repair cost regression, turnaround scheduling, insurance intelligence & problem diagnosis...</p>
+</div>
+
+<!-- ================= VEHICLE ANALYSIS RESULT ================= -->
+<div id="analysisResultBox" class="result-box" style="margin-top: 2rem; display: none;">
+  
+  <!-- Alert Banner: Reminding user to Save Result -->
+  <div id="unSavedAlertBanner" style="background: rgba(234, 179, 8, 0.12); border: 1.5px solid rgba(234, 179, 8, 0.4); border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <span style="font-size: 1.8rem;">⚠️</span>
+      <div>
+        <strong style="color: #facc15; font-size: 0.98rem; display: block;">Important: This Check is NOT Saved to Your Account Yet!</strong>
+        <span style="color: #cbd5e1; font-size: 0.85rem;">Click the <strong>"💾 SAVE RESULT"</strong> button to save this check into your MySQL database so it appears in your History & Dashboard.</span>
+      </div>
+    </div>
+    <button type="button" class="btn btn-neon" onclick="savePredictionResult()" style="padding: 0.7rem 1.5rem; font-weight: 800; font-size: 0.92rem; box-shadow: 0 0 16px rgba(221, 39, 245, 0.5);">
+      💾 SAVE RESULT NOW
+    </button>
+  </div>
+
+  <!-- Success Banner after Saving -->
+  <div id="savedSuccessBanner" style="display: none; background: rgba(16, 185, 129, 0.14); border: 1.5px solid rgba(16, 185, 129, 0.4); border-radius: 10px; padding: 1.1rem 1.3rem; margin-bottom: 1.5rem; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <span style="font-size: 1.8rem;">🎉</span>
+      <div>
+        <strong style="color: #34d399; font-size: 1.05rem; display: block;" id="savedSuccessTitle">Successfully Saved to MySQL Database!</strong>
+        <span style="color: #cbd5e1; font-size: 0.88rem;">Your vehicle check is now recorded in your Service History and Fleet Dashboard.</span>
+      </div>
+    </div>
+    <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+      <a href="{{ url_for('vehicles_page') }}" class="btn btn-secondary" style="padding: 0.65rem 1.1rem; font-weight: 600; font-size: 0.88rem;">
+        🚗 View in My Vehicles
+      </a>
+      <a href="{{ url_for('history_page') }}" class="btn btn-neon" style="padding: 0.65rem 1.2rem; font-weight: 700; font-size: 0.88rem;">
+        📋 View in My History &rarr;
+      </a>
+      <a href="{{ url_for('dashboard_page') }}" class="btn btn-secondary" style="padding: 0.65rem 1.1rem; font-weight: 600; font-size: 0.88rem;">
+        📊 View Dashboard
+      </a>
+    </div>
+  </div>
+
+  <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <span id="saveStatusBadge" class="badge badge-warning" style="font-size: 0.78rem;">⚠️ Prediction Generated (Unsaved)</span>
+      <h2 style="font-size: 1.5rem; font-weight: 800; color: #fff; margin-top: 0.25rem;">🚗 Vehicle Analysis Result</h2>
+    </div>
+    <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+      <!-- SAVE RESULT BUTTON: SOURCE OF TRUTH FOR MYSQL DATABASE -->
+      <button type="button" id="btnSaveResult" class="btn btn-neon btn-save-action" onclick="savePredictionResult()" style="font-size: 0.88rem; font-weight: 700; box-shadow: 0 0 15px rgba(221, 39, 245, 0.4);">
+        <span>💾 SAVE RESULT</span>
+      </button>
+      <a href="{{ url_for('check_page') }}" class="btn btn-secondary" style="font-size: 0.85rem;">🔄 NEW CHECK</a>
+      <a href="{{ url_for('history_page') }}" class="btn btn-secondary" onclick="return confirmNavigationToHistory()" style="font-size: 0.85rem;">📋 MY HISTORY</a>
+    </div>
+  </div>
+
+  <!-- Key Metrics 3-Col Summary -->
+  <div class="grid-3" style="margin-bottom: 1.5rem;">
+    <!-- 1. Cost -->
+    <div class="glass-card" style="text-align: center;">
+      <p style="color: var(--text-muted); font-size: 0.78rem; text-transform: uppercase; font-weight: 700;">💰 Estimated Repair Cost</p>
+      <div id="aiCost" class="metric-highlight" style="margin: 0.4rem 0;">--</div>
+      <p style="font-size: 0.8rem; color: var(--text-secondary);">
+        Difference vs Shop Estimate: <strong id="aiVariance" style="color: var(--accent-emerald);">--</strong>
+      </p>
+    </div>
+
+    <!-- 2. Time -->
+    <div class="glass-card" style="text-align: center;">
+      <p style="color: var(--text-muted); font-size: 0.78rem; text-transform: uppercase; font-weight: 700;">⏱️ Estimated Service Time</p>
+      <div id="aiTime" class="metric-highlight" style="color: var(--accent-emerald); margin: 0.4rem 0;">--</div>
+      <p style="font-size: 0.8rem; color: var(--text-secondary);">Bay turnaround duration</p>
+    </div>
+
+    <!-- 3. Insurance -->
+    <div class="glass-card" style="text-align: center;">
+      <p style="color: var(--text-muted); font-size: 0.78rem; text-transform: uppercase; font-weight: 700;">🛡️ Insurance Prediction</p>
+      <div style="margin: 0.6rem 0;">
+        <span id="aiInsuranceBadge" class="badge badge-neon" style="font-size: 0.92rem; padding: 0.35rem 0.9rem;">--</span>
+      </div>
+      <p style="font-size: 0.8rem; color: var(--text-secondary);">
+        Confidence: <strong id="aiInsuranceProb">--</strong>
+      </p>
+    </div>
+  </div>
+
+  <!-- Problem Diagnosis & Root Cause Panel -->
+  <div class="glass-card" style="margin-bottom: 1.5rem; background: rgba(14, 16, 24, 0.9);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <span style="font-size: 1.5rem;">🔍</span>
+        <div>
+          <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Possible Vehicle Problem:</span>
+          <h3 id="aiDiagnosisCat" style="font-size: 1.2rem; font-weight: 800; color: #fff;">--</h3>
+        </div>
+      </div>
+      <span id="aiSeverityBadge" class="badge badge-warning" style="font-size: 0.85rem;">--</span>
+    </div>
+
+    <div style="background: rgba(221, 39, 245, 0.06); padding: 1rem; border-radius: 8px; border-left: 3px solid var(--accent-purple);">
+      <p style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">🔧 Recommended Service & Fix</p>
+      <p id="aiDiagnosisFix" style="color: #fff; font-size: 0.95rem; line-height: 1.5; margin-top: 0.3rem;">
+        --
+      </p>
+    </div>
+  </div>
+
+  <!-- Parts Action Plan: Replace vs Repair -->
+  <div class="glass-card" style="padding: 1.5rem; background: rgba(14, 16, 24, 0.9);">
+    <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+      <span>🧰</span> <span>Recommended Parts</span>
+    </h3>
+
+    <div class="grid-2">
+      <!-- Replace -->
+      <div style="background: rgba(244, 63, 94, 0.08); padding: 1.1rem; border-radius: 8px; border: 1px solid rgba(244, 63, 94, 0.25);">
+        <h4 style="color: var(--accent-rose); font-size: 0.85rem; text-transform: uppercase; font-weight: 700; margin-bottom: 0.6rem;">
+          🔴 Replace:
+        </h4>
+        <ul id="aiReplaceParts" style="list-style: none; font-size: 0.9rem; color: #e4e4e7; display: flex; flex-direction: column; gap: 0.45rem;">
+          <li>--</li>
+        </ul>
+      </div>
+
+      <!-- Repair -->
+      <div style="background: rgba(16, 185, 129, 0.08); padding: 1.1rem; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.25);">
+        <h4 style="color: var(--accent-emerald); font-size: 0.85rem; text-transform: uppercase; font-weight: 700; margin-bottom: 0.6rem;">
+          🟢 Repair:
+        </h4>
+        <ul id="aiRepairActions" style="list-style: none; font-size: 0.9rem; color: #e4e4e7; display: flex; flex-direction: column; gap: 0.45rem;">
+          <li>--</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Save Action Panel -->
+  <div id="bottomSaveActionBox" style="text-align: center; margin-top: 1.75rem; padding: 1.75rem; background: rgba(221, 39, 245, 0.08); border: 1.5px dashed rgba(221, 39, 245, 0.35); border-radius: 14px;">
+    <h3 style="color: #fff; font-size: 1.2rem; font-weight: 800; margin-bottom: 0.35rem;">💾 Save This Vehicle Check to Database</h3>
+    <p style="color: var(--text-muted); font-size: 0.88rem; max-width: 600px; margin: 0 auto 1.25rem auto;">
+      Click the button below to store this analysis in MySQL. It will immediately appear in your <strong>Service History</strong> and update the <strong>Fleet Dashboard</strong> statistics.
+    </p>
+    <button type="button" id="btnSaveResultBottom" class="btn btn-neon" onclick="savePredictionResult()" style="padding: 0.95rem 2.5rem; font-size: 1.05rem; font-weight: 800; box-shadow: 0 0 25px rgba(221, 39, 245, 0.5);">
+      <span>💾 SAVE RESULT TO MY HISTORY & DASHBOARD</span>
+    </button>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentPredictionPayload = null;
+
+// Auto-fill selected saved vehicle
+function loadSavedVehicle(selectElem) {
+  const selectedOpt = selectElem.options[selectElem.selectedIndex];
+  if (!selectedOpt || !selectedOpt.value) return;
+
+  const brand = selectedOpt.getAttribute("data-brand");
+  const model = selectedOpt.getAttribute("data-model");
+  const vtype = selectedOpt.getAttribute("data-type");
+  const mileage = selectedOpt.getAttribute("data-mileage");
+  const fuel = selectedOpt.getAttribute("data-fuel");
+  const trans = selectedOpt.getAttribute("data-trans");
+  const year = selectedOpt.getAttribute("data-year");
+
+  const brandSelect = document.getElementById("brandSelect");
+  const modelSelect = document.getElementById("modelSelect");
+  const typeSelect = document.getElementById("vehicleType");
+  const fuelSelect = document.getElementById("fuelType");
+  const transSelect = document.getElementById("transmission");
+  const yearInput = document.getElementById("mfgYear");
+  const mileageInput = document.getElementById("mileage");
+
+  if (brandSelect && brand) {
+    brandSelect.value = brand;
+    brandSelect.dispatchEvent(new Event("change"));
+    setTimeout(() => {
+      if (modelSelect && model) modelSelect.value = model;
+    }, 100);
+  }
+  if (typeSelect && vtype) typeSelect.value = vtype;
+  if (fuelSelect && fuel) fuelSelect.value = fuel;
+  if (transSelect && trans) transSelect.value = trans;
+  if (yearInput && year) yearInput.value = year;
+  if (mileageInput && mileage) mileageInput.value = mileage;
+}
+
+// Preset Scenario Buttons
+function fillScenario(scenario) {
+  const brandSelect = document.getElementById("brandSelect");
+  const modelSelect = document.getElementById("modelSelect");
+  const problemDesc = document.getElementById("problemDescription");
+  const serviceType = document.getElementById("serviceType");
+  const estCost = document.getElementById("estimatedCost");
+  const partsUsed = document.getElementById("partsUsed");
+
+  if (scenario === 'brake') {
+    if (brandSelect) { brandSelect.value = "Toyota"; brandSelect.dispatchEvent(new Event("change")); }
+    setTimeout(() => { if (modelSelect) modelSelect.value = "Camry"; }, 100);
+    if (serviceType) serviceType.value = "Brake System Service";
+    if (estCost) estCost.value = "240.00";
+    if (partsUsed) partsUsed.value = "brake pads, brake rotor";
+    if (problemDesc) problemDesc.value = "Squealing metallic grinding sound when braking at highway speeds.";
+    const ecuInput = document.getElementById("ecuData");
+    if (ecuInput) ecuInput.value = "";
+  } else if (scenario === 'engine') {
+    if (brandSelect) { brandSelect.value = "BMW"; brandSelect.dispatchEvent(new Event("change")); }
+    setTimeout(() => { if (modelSelect) modelSelect.value = "3 Series"; }, 100);
+    if (serviceType) serviceType.value = "Engine Diagnostics & Tune-up";
+    if (estCost) estCost.value = "650.00";
+    if (partsUsed) partsUsed.value = "spark plugs, ignition coil";
+    if (problemDesc) problemDesc.value = "Engine vibration, misfiring, check engine light ON.";
+    const ecuInput = document.getElementById("ecuData");
+    if (ecuInput) ecuInput.value = "P0300";
+  } else if (scenario === 'transmission') {
+    if (brandSelect) { brandSelect.value = "Ford"; brandSelect.dispatchEvent(new Event("change")); }
+    setTimeout(() => { if (modelSelect) modelSelect.value = "F-150"; }, 100);
+    if (serviceType) serviceType.value = "Transmission Repair";
+    if (estCost) estCost.value = "1100.00";
+    if (partsUsed) partsUsed.value = "transmission fluid, filter kit, gasket";
+    if (problemDesc) problemDesc.value = "Transmission slipping and delayed gear shift engagement when cold.";
+    const ecuInput = document.getElementById("ecuData");
+    if (ecuInput) ecuInput.value = "P0700";
+  }
+}
+
+let isPredictionSaved = false;
+
+// Warn user if navigating to History without saving
+function confirmNavigationToHistory() {
+  if (!isPredictionSaved && currentPredictionPayload) {
+    return confirm("⚠️ Attention: You have analyzed your vehicle, but you have NOT clicked 'SAVE RESULT' yet!\n\nIf you leave now without clicking SAVE, this check will NOT be saved to your History or Dashboard.\n\nClick CANCEL to stay and click 'SAVE RESULT', or click OK to leave without saving.");
+  }
+  return true;
+}
+
+// Form Submission Handler: Runs ML without persisting to DB
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("vehicleCheckForm");
+  if (!form) return;
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById("btnAnalyzeVehicle");
+    const loader = document.getElementById("aiLoadingIndicator");
+    const resBox = document.getElementById("analysisResultBox");
+    const saveBtn = document.getElementById("btnSaveResult");
+    const saveBtnBottom = document.getElementById("btnSaveResultBottom");
+    const badge = document.getElementById("saveStatusBadge");
+    const unsavedBanner = document.getElementById("unSavedAlertBanner");
+    const savedBanner = document.getElementById("savedSuccessBanner");
+
+    btn.disabled = true;
+    loader.style.display = "block";
+    if (resBox) resBox.style.display = "none";
+    loader.scrollIntoView({ behavior: "smooth" });
+
+    // 1. Clear old prediction DOM values before new analysis starts
+    document.getElementById("aiCost").textContent = "--";
+    document.getElementById("aiVariance").textContent = "--";
+    document.getElementById("aiTime").textContent = "--";
+    const insBadgeInit = document.getElementById("aiInsuranceBadge");
+    if (insBadgeInit) {
+      insBadgeInit.className = "badge badge-secondary";
+      insBadgeInit.textContent = "--";
+    }
+    document.getElementById("aiInsuranceProb").textContent = "--";
+    document.getElementById("aiDiagnosisCat").textContent = "Analyzing...";
+    document.getElementById("aiDiagnosisFix").textContent = "Running diagnostic analysis...";
+    const sevBadgeInit = document.getElementById("aiSeverityBadge");
+    if (sevBadgeInit) {
+      sevBadgeInit.className = "badge badge-secondary";
+      sevBadgeInit.textContent = "--";
+    }
+    document.getElementById("aiReplaceParts").innerHTML = "<li>Analyzing replacement parts...</li>";
+    document.getElementById("aiRepairActions").innerHTML = "<li>Analyzing repair procedures...</li>";
+
+    // 2. Reset save state (Only saved once user clicks SAVE RESULT)
+    isPredictionSaved = false;
+    currentPredictionPayload = null;
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = "<span>💾 SAVE RESULT</span>";
+      saveBtn.className = "btn btn-neon btn-save-action";
+    }
+    if (saveBtnBottom) {
+      saveBtnBottom.disabled = false;
+      saveBtnBottom.innerHTML = "<span>💾 SAVE RESULT TO MY HISTORY & DASHBOARD</span>";
+      saveBtnBottom.className = "btn btn-neon";
+    }
+    if (badge) {
+      badge.className = "badge badge-warning";
+      badge.textContent = "⚠️ Prediction Generated (Unsaved)";
+    }
+    if (unsavedBanner) unsavedBanner.style.display = "flex";
+    if (savedBanner) savedBanner.style.display = "none";
+
+    const formData = new FormData(form);
+    const payload = Object.fromEntries(formData.entries());
+
+    try {
+      const res = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const json = await res.json();
+
+      if (json.status === "success") {
+        const d = json.data;
+        currentPredictionPayload = d; // Cache for explicit save action
+        isPredictionSaved = false; // Remains unsaved until user clicks SAVE RESULT
+
+        loader.style.display = "none";
+        if (resBox) {
+          resBox.style.display = "block";
+          resBox.scrollIntoView({ behavior: "smooth" });
+        }
+
+        // Keep save prompt visible
+        if (badge) {
+          badge.className = "badge badge-warning";
+          badge.textContent = "⚠️ Prediction Generated (Unsaved)";
+        }
+        if (unsavedBanner) unsavedBanner.style.display = "flex";
+        if (savedBanner) savedBanner.style.display = "none";
+
+        // Fill Cost & Time
+        document.getElementById("aiCost").textContent = `$${d.predicted_cost.toFixed(2)}`;
+        document.getElementById("aiTime").textContent = `${d.predicted_time_hours.toFixed(1)} hours`;
+        
+        const varSign = d.estimated_vs_actual_variance >= 0 ? "+$" : "-$";
+        document.getElementById("aiVariance").textContent = `${varSign}${Math.abs(d.estimated_vs_actual_variance).toFixed(2)}`;
+
+        // Fill Insurance
+        const insBadge = document.getElementById("aiInsuranceBadge");
+        if (d.predicted_insurance_claim === 1) {
+          insBadge.className = "badge badge-success";
+          insBadge.textContent = "Approved / Covered";
+        } else {
+          insBadge.className = "badge badge-warning";
+          insBadge.textContent = "Direct Out-of-Pocket / Not Covered";
+        }
+        document.getElementById("aiInsuranceProb").textContent = `${d.insurance_probability_pct}%`;
+
+        // Fill Diagnosis
+        document.getElementById("aiDiagnosisCat").textContent = d.problem_classification;
+        document.getElementById("aiDiagnosisFix").textContent = d.how_to_fix;
+        
+        const sevBadge = document.getElementById("aiSeverityBadge");
+        sevBadge.className = `badge ${d.severity_badge}`;
+        sevBadge.textContent = `${d.severity} Severity`;
+
+        // Fill Parts
+        document.getElementById("aiReplaceParts").innerHTML = d.recommended_replace_parts.map(p => `<li>🔴 <strong>${p}</strong></li>`).join("");
+        document.getElementById("aiRepairActions").innerHTML = d.recommended_repair_actions.map(a => `<li>🟢 <strong>${a}</strong></li>`).join("");
+      } else {
+        alert("Analysis error: " + json.message);
+        loader.style.display = "none";
+      }
+    } catch (err) {
+      alert("Network or prediction error: " + err.message);
+      loader.style.display = "none";
+    } finally {
+      btn.disabled = false;
+    }
+  });
+});
+
+// Explicit Save Prediction Handler (Source of Truth for MySQL)
+async function savePredictionResult() {
+  if (!currentPredictionPayload) {
+    alert("No active prediction to save.");
+    return;
+  }
+
+  const saveBtn = document.getElementById("btnSaveResult");
+  const saveBtnBottom = document.getElementById("btnSaveResultBottom");
+  const badge = document.getElementById("saveStatusBadge");
+  const unsavedBanner = document.getElementById("unSavedAlertBanner");
+  const savedBanner = document.getElementById("savedSuccessBanner");
+  const savedTitle = document.getElementById("savedSuccessTitle");
+
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = "<span>⏳ Saving...</span>";
+  }
+  if (saveBtnBottom) {
+    saveBtnBottom.disabled = true;
+    saveBtnBottom.innerHTML = "<span>⏳ Saving to MySQL Database...</span>";
+  }
+
+  try {
+    const res = await fetch("/api/save-prediction", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(currentPredictionPayload)
+    });
+    const json = await res.json();
+
+    if (json.status === "success") {
+      isPredictionSaved = true;
+
+      if (saveBtn) {
+        saveBtn.className = "btn btn-secondary";
+        saveBtn.innerHTML = `<span>✅ SAVED (#${json.prediction_id})</span>`;
+        saveBtn.disabled = true;
+      }
+      if (saveBtnBottom) {
+        saveBtnBottom.className = "btn btn-secondary";
+        saveBtnBottom.innerHTML = `<span>✅ RESULT SUCCESSFULLY SAVED (Check #${json.prediction_id})</span>`;
+        saveBtnBottom.disabled = true;
+      }
+
+      if (badge) {
+        badge.className = "badge badge-success";
+        badge.textContent = `✅ Saved to MySQL (Check #${json.prediction_id})`;
+      }
+
+      // Switch banners
+      if (unsavedBanner) unsavedBanner.style.display = "none";
+      if (savedBanner) {
+        savedBanner.style.display = "flex";
+        if (savedTitle) {
+          savedTitle.textContent = `🎉 Check #${json.prediction_id} Successfully Saved to Database!`;
+        }
+        savedBanner.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      alert("Save failed: " + json.message);
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = "<span>💾 SAVE RESULT</span>";
+      }
+      if (saveBtnBottom) {
+        saveBtnBottom.disabled = false;
+        saveBtnBottom.innerHTML = "<span>💾 SAVE RESULT TO MY HISTORY & DASHBOARD</span>";
+      }
+    }
+  } catch (err) {
+    alert("Network error while saving: " + err.message);
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = "<span>💾 SAVE RESULT</span>";
+    }
+    if (saveBtnBottom) {
+      saveBtnBottom.disabled = false;
+      saveBtnBottom.innerHTML = "<span>💾 SAVE RESULT TO MY HISTORY & DASHBOARD</span>";
+    }
+  }
+}
+</script>
+{% endblock %}

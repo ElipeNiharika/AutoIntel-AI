@@ -1,0 +1,428 @@
+{
+  "categories": {
+    "Battery": {
+      "common_diagnoses": [
+        "Dead battery",
+        "Starter motor failure",
+        "Faulty alternator",
+        "Charging system fault"
+      ],
+      "recommended_fixes": [
+        "Replace battery and test charging system",
+        "Test charging system",
+        "Replace starter motor",
+        "Replace alternator and test battery condition"
+      ],
+      "replace_parts": [
+        "Replaced alternator",
+        "Pending replace starter motor",
+        "Pending replace battery",
+        "Replaced battery",
+        "Replaced failure",
+        "Replaced fault",
+        "Pending replace alternator"
+      ],
+      "repair_actions": [
+        "Repair in progress",
+        "Pending test charging system",
+        "Test charging system"
+      ],
+      "default_severity": "High"
+    },
+    "Brakes": {
+      "common_diagnoses": [
+        "Warped rotors",
+        "Low brake fluid",
+        "Worn pads",
+        "Worn brake pads",
+        "Worn master cylinder"
+      ],
+      "recommended_fixes": [
+        "Refill brake fluid",
+        "Resurface or replace rotors",
+        "Replace brake master cylinder and bleed brake system",
+        "Replace brake pads and rotors",
+        "Replace brake pads and resurface rotors"
+      ],
+      "replace_parts": [
+        "Replaced cylinder",
+        "Pending replace brake pads",
+        "Pending replace master cylinder",
+        "Replaced fluid",
+        "Pending replace brake pads and rotors",
+        "Replaced rotors",
+        "Replaced pads",
+        "Pending resurface or replace rotors"
+      ],
+      "repair_actions": [
+        "Repair in progress",
+        "Pending refill brake fluid",
+        "Refill brake fluid"
+      ],
+      "default_severity": "Medium"
+    },
+    "Electrical": {
+      "common_diagnoses": [
+        "Loose wiring",
+        "Window regulator motor",
+        "Dead battery",
+        "Wiring issue",
+        "Faulty alternator"
+      ],
+      "recommended_fixes": [
+        "Check and repair loose or damaged wiring connections",
+        "Replace alternator and test battery condition",
+        "Secure and repair connections",
+        "Replace regulator motor",
+        "Replace battery and test charging system"
+      ],
+      "replace_parts": [
+        "Replaced wiring",
+        "Replaced alternator",
+        "Replaced motor",
+        "Pending replace regulator motor",
+        "Pending replace battery",
+        "Replaced battery",
+        "Pending replace alternator",
+        "Replaced issue"
+      ],
+      "repair_actions": [
+        "Pending secure and repair connections",
+        "Pending check and repair wiring",
+        "Repair in progress",
+        "Check and repair wiring",
+        "Secure and repair connections"
+      ],
+      "default_severity": "Medium"
+    },
+    "Engine": {
+      "common_diagnoses": [
+        "Timing belt failure",
+        "Spark plug wear",
+        "Fuel pump issue",
+        "Ignition coil failure",
+        "Catalytic converter issue"
+      ],
+      "recommended_fixes": [
+        "Replace spark plugs",
+        "Replace faulty ignition coil and spark plugs",
+        "Replace the catalytic converter with a new OEM part",
+        "Replace fuel pump",
+        "Replace timing belt"
+      ],
+      "replace_parts": [
+        "Replaced failure",
+        "Pending replace ignition coils",
+        "Pending replace catalytic converter",
+        "Pending replace timing belt",
+        "Pending replace fuel pump",
+        "Pending replace spark plugs",
+        "Replaced wear",
+        "Replaced issue"
+      ],
+      "repair_actions": [
+        "Repair in progress"
+      ],
+      "default_severity": "High"
+    },
+    "Transmission": {
+      "common_diagnoses": [
+        "Transmission fluid thick",
+        "Clutch pack wear",
+        "Transmission fluid low",
+        "Transmission solenoid",
+        "Transmission wear"
+      ],
+      "recommended_fixes": [
+        "Perform transmission service and inspect for internal damage",
+        "Replace transmission fluid",
+        "Refill transmission fluid",
+        "Replace solenoid pack",
+        "Replace clutch packs"
+      ],
+      "replace_parts": [
+        "Pending replace transmission fluid",
+        "Replaced low",
+        "Replaced solenoid",
+        "Pending replace solenoid pack",
+        "Pending replace clutch packs",
+        "Replaced thick",
+        "Replaced wear"
+      ],
+      "repair_actions": [
+        "Perform transmission service",
+        "Pending refill transmission fluid",
+        "Refill transmission fluid",
+        "Repair in progress",
+        "Pending perform transmission service"
+      ],
+      "default_severity": "High"
+    }
+  },
+  "symptoms": {
+    "headlights flicker": {
+      "problem_classification": "Electrical",
+      "severity": "Medium",
+      "diagnosis": "Loose wiring",
+      "how_to_fix": "Check and repair loose or damaged wiring connections",
+      "replace_parts": [
+        "Inspect & replace damaged component"
+      ],
+      "repair_actions": [
+        "Check and repair wiring"
+      ]
+    },
+    "power window failure": {
+      "problem_classification": "Electrical",
+      "severity": "Medium",
+      "diagnosis": "Window regulator motor",
+      "how_to_fix": "Check and repair loose or damaged wiring connections",
+      "replace_parts": [
+        "Inspect & replace damaged component"
+      ],
+      "repair_actions": [
+        "Check and repair wiring"
+      ]
+    },
+    "engine misfire": {
+      "problem_classification": "Engine",
+      "severity": "High",
+      "diagnosis": "Timing belt failure",
+      "how_to_fix": "Replace spark plugs",
+      "replace_parts": [
+        "Replaced failure"
+      ],
+      "repair_actions": [
+        "Clean, tighten, or recalibrate component"
+      ]
+    },
+    "transmission overheating": {
+      "problem_classification": "Transmission",
+      "severity": "High",
+      "diagnosis": "Transmission fluid thick",
+      "how_to_fix": "Perform transmission service and inspect for internal damage",
+      "replace_parts": [
+        "Inspect & replace damaged component"
+      ],
+      "repair_actions": [
+        "Perform transmission service"
+      ]
+    },
+    "battery drains fast": {
+      "problem_classification": "Battery",
+      "severity": "High",
+      "diagnosis": "Dead battery",
+      "how_to_fix": "Replace battery and test charging system",
+      "replace_parts": [
+        "Replaced battery"
+      ],
+      "repair_actions": [
+        "Clean, tighten, or recalibrate component"
+      ]
+    },
+    "slipping gears": {
+      "problem_classification": "Transmission",
+      "severity": "Medium",
+      "diagnosis": "Transmission fluid thick",
+      "how_to_fix": "Replace transmission fluid",
+      "replace_parts": [
+        "Replaced thick"
+      ],
+      "repair_actions": [
+        "Clean, tighten, or recalibrate component"
+      ]
+    },
+    "car wont start": {
+      "problem_classification": "Electrical",
+      "severity": "Low",
+      "diagnosis": "Dead battery",
+      "how_to_fix": "Replace alternator and test battery condition",
+      "replace_parts": [
+        "Inspect & replace damaged component"
+      ],
+      "repair_actions": [
+        "Repair in progress"
+      ]
+    },
+    "engine overheating": {
+      "problem_classification": "Engine",
+      "severity": "High",
+      "diagnosis": "Timing belt failure",
+      "how_to_fix": "Replace spark plugs",
+      "replace_parts": [
+        "Replaced failure"
+      ],
+      "repair_actions": [
+        "Clean, tighten, or recalibrate component"
+      ]
+    },
+    "soft brake pedal": {
+      "problem_classification": "Brakes",
+      "severity": "Medium",
+      "diagnosis": "Warped rotors",
+      "how_to_fix": "Refill brake fluid",
+      "replace_parts": [
+        "Inspect & replace damaged component"
+      ],
+      "repair_actions": [
+        "Refill brake fluid"
+      ]
+    },
+    "brake noise": {
+      "problem_classification": "Brakes",
+      "severity": "High",
+      "diagnosis": "Low brake fluid",
+      "how_to_fix": "Resurface or replace rotors",
+      "replace_parts": [
+        "Replaced fluid"
+      ],
+      "repair_actions": [
+        "Clean, tighten, or recalibrate component"
+      ]
+    },
+    "check engine light on": {
+      "problem_classification": "Engine",
+      "severity": "Medium",
+      "diagnosis": "Timing belt failure",
+      "how_to_fix": "Replace spark plugs",
+      "replace_parts": [
+        "Replaced failure"
+      ],
+      "repair_actions": [
+        "Clean, tighten, or recalibrate component"
+      ]
+    },
+    "gear grinding": {
+      "problem_classification": "Transmission",
+      "severity": "High",
+      "diagnosis": "Transmission fluid low",
+      "how_to_fix": "Refill transmission fluid",
+      "replace_parts": [
+        "Inspect & replace damaged component"
+      ],
+      "repair_actions": [
+        "Refill transmission fluid"
+      ]
+    },
+    "smoke from exhaust": {
+      "problem_classification": "Engine",
+      "severity": "High",
+      "diagnosis": "Fuel pump issue",
+      "how_to_fix": "Replace the catalytic converter with a new OEM part",
+      "replace_parts": [
+        "Replaced issue"
+      ],
+      "repair_actions": [
+        "Clean, tighten, or recalibrate component"
+      ]
+    },
+    "squealing brakes": {
+      "problem_classification": "Brakes",
+      "severity": "High",
+      "diagnosis": "Low brake fluid",
+      "how_to_fix": "Replace brake master cylinder and bleed brake system",
+      "replace_parts": [
+        "Replaced fluid"
+      ],
+      "repair_actions": [
+        "Clean, tighten, or recalibrate component"
+      ]
+    },
+    "battery warning light": {
+      "problem_classification": "Battery",
+      "severity": "Low",
+      "diagnosis": "Faulty alternator",
+      "how_to_fix": "Replace battery and test charging system",
+      "replace_parts": [
+        "Inspect & replace damaged component"
+      ],
+      "repair_actions": [
+        "Repair in progress"
+      ]
+    },
+    "engine stalling": {
+      "problem_classification": "Engine",
+      "severity": "Medium",
+      "diagnosis": "Ignition coil failure",
+      "how_to_fix": "Replace fuel pump",
+      "replace_parts": [
+        "Replaced failure"
+      ],
+      "repair_actions": [
+        "Clean, tighten, or recalibrate component"
+      ]
+    },
+    "vibration when braking": {
+      "problem_classification": "Brakes",
+      "severity": "High",
+      "diagnosis": "Warped rotors",
+      "how_to_fix": "Replace brake master cylinder and bleed brake system",
+      "replace_parts": [
+        "Replaced rotors"
+      ],
+      "repair_actions": [
+        "Clean, tighten, or recalibrate component"
+      ]
+    },
+    "gear shift hard": {
+      "problem_classification": "Transmission",
+      "severity": "Medium",
+      "diagnosis": "Transmission fluid low",
+      "how_to_fix": "Replace solenoid pack",
+      "replace_parts": [
+        "Replaced low"
+      ],
+      "repair_actions": [
+        "Clean, tighten, or recalibrate component"
+      ]
+    },
+    "dashboard flickering": {
+      "problem_classification": "Electrical",
+      "severity": "Medium",
+      "diagnosis": "Faulty alternator",
+      "how_to_fix": "Replace regulator motor",
+      "replace_parts": [
+        "Pending replace regulator motor"
+      ],
+      "repair_actions": [
+        "Clean, tighten, or recalibrate component"
+      ]
+    },
+    "clicking sound when starting": {
+      "problem_classification": "Battery",
+      "severity": "Medium",
+      "diagnosis": "Dead battery",
+      "how_to_fix": "Replace battery and test charging system",
+      "replace_parts": [
+        "Replaced battery"
+      ],
+      "repair_actions": [
+        "Clean, tighten, or recalibrate component"
+      ]
+    },
+    "brake pedal hard": {
+      "problem_classification": "Brakes",
+      "severity": "High",
+      "diagnosis": "Worn brake pads",
+      "how_to_fix": "Replace brake pads and resurface rotors",
+      "replace_parts": [
+        "Replaced pads"
+      ],
+      "repair_actions": [
+        "Clean, tighten, or recalibrate component"
+      ]
+    },
+    "delayed shifting": {
+      "problem_classification": "Transmission",
+      "severity": "Medium",
+      "diagnosis": "Transmission solenoid",
+      "how_to_fix": "Replace solenoid pack",
+      "replace_parts": [
+        "Replaced solenoid"
+      ],
+      "repair_actions": [
+        "Clean, tighten, or recalibrate component"
+      ]
+    }
+  }
+}

@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard - AutoIntel AI{% endblock %}
+{% block page_title %}Fleet Administrator Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">📊 Fleet <span>Administrator</span> Control Center</h1>
+    <p class="page-subtitle">Real-time MySQL operational statistics, predictive analytics, and executive reports.</p>
+  </div>
+  <div style="display: flex; gap: 0.75rem;">
+    <a href="{{ url_for('export_csv') }}" class="btn btn-secondary">📥 Export CSV</a>
+    <a href="{{ url_for('export_pdf') }}" class="btn btn-neon">📑 Export PDF Report</a>
+  </div>
+</div>
+
+<!-- 4 Top KPI Cards -->
+<div class="grid-4" style="margin-bottom: 2rem;">
+  <div class="kpi-card">
+    <span class="kpi-title">Total System Inferences</span>
+    <div class="kpi-value" id="kpiTotal">0</div>
+    <span class="kpi-subtitle">Logged in Database</span>
+  </div>
+
+  <div class="kpi-card">
+    <span class="kpi-title">Average Repair Cost</span>
+    <div class="kpi-value" id="kpiAvgCost">$0.00</div>
+    <span class="kpi-subtitle">Across All Workorders</span>
+  </div>
+
+  <div class="kpi-card">
+    <span class="kpi-title">Average Turnaround Time</span>
+    <div class="kpi-value" id="kpiAvgTime" style="color: var(--accent-emerald);">0.0 hrs</div>
+    <span class="kpi-subtitle">Mean Bay Duration</span>
+  </div>
+
+  <div class="kpi-card">
+    <span class="kpi-title">Insurance Approval Rate</span>
+    <div class="kpi-value" id="kpiInsPct" style="color: var(--accent-purple);">0.0%</div>
+    <span class="kpi-subtitle">Reimbursable Claims</span>
+  </div>
+</div>
+
+<!-- Charts Grid -->
+<div class="grid-2" style="margin-bottom: 2rem;">
+  <div class="glass-card glass-card-neon-top">
+    <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">
+      🔍 Diagnostic Category Breakdown
+    </h3>
+    <div style="position: relative; height: 260px; display: flex; justify-content: center;">
+      <canvas id="chartCategories"></canvas>
+    </div>
+  </div>
+
+  <div class="glass-card glass-card-neon-top">
+    <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">
+      🛠️ Service Type Workorder Volume
+    </h3>
+    <div style="position: relative; height: 260px;">
+      <canvas id="chartServices"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="grid-2">
+  <div class="glass-card glass-card-neon-top">
+    <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">
+      ⚙️ Most Replaced Automotive Parts
+    </h3>
+    <div style="position: relative; height: 260px;">
+      <canvas id="chartParts"></canvas>
+    </div>
+  </div>
+
+  <div class="glass-card glass-card-neon-top">
+    <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">
+      ⚡ Admin Quick Navigation
+    </h3>
+    
+    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+      <a href="{{ url_for('admin_users_page') }}" class="btn btn-secondary" style="justify-content: flex-start;">
+        <span>👥 Manage Registered Users</span>
+      </a>
+      <a href="{{ url_for('admin_analytics_page') }}" class="btn btn-secondary" style="justify-content: flex-start;">
+        <span>📈 Operational Fleet Analytics</span>
+      </a>
+      <a href="{{ url_for('admin_history_page') }}" class="btn btn-secondary" style="justify-content: flex-start;">
+        <span>📋 System Prediction History</span>
+      </a>
+      <a href="{{ url_for('export_pdf') }}" class="btn btn-neon" style="justify-content: flex-start;">
+        <span>📑 Download Executive Audit PDF</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Inferences Table -->
+<div class="glass-card" style="margin-top: 2rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+    <div>
+      <h3 style="font-size: 1.15rem; font-weight: 800; color: #fff;">
+        🚗 Recent System Inferences & Workorders
+      </h3>
+      <p style="color: var(--text-muted); font-size: 0.82rem; margin-top: 0.2rem;">Live predictions logged in MySQL across all fleet users.</p>
+    </div>
+    <a href="{{ url_for('admin_history_page') }}" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.45rem 0.9rem;">📋 Full Prediction History &rarr;</a>
+  </div>
+
+  {% if recent_checks %}
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Check ID</th>
+            <th>Date</th>
+            <th>Vehicle</th>
+            <th>Service Type</th>
+            <th>Estimated Cost</th>
+            <th>Turnaround</th>
+            <th>Insurance Status</th>
+            <th>Severity</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in recent_checks %}
+            <tr>
+              <td><strong style="color: var(--accent-purple);">#{{ r.id }}</strong></td>
+              <td>{{ r.created_at.strftime('%Y-%m-%d %H:%M') if r.created_at else 'Recent' }}</td>
+              <td><strong>{{ r.vehicle_info }}</strong></td>
+              <td>{{ r.service_type }}</td>
+              <td style="color: var(--accent-purple); font-weight: 700;">${{ "%.2f"|format(r.predicted_cost) }}</td>
+              <td>{{ "%.1f"|format(r.predicted_time) }} hrs</td>
+              <td>
+                {% if r.predicted_insurance_claim == 1 %}
+                  <span class="badge badge-success">Covered</span>
+                {% else %}
+                  <span class="badge badge-warning">Direct</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if r.severity in ['High', 'Critical'] %}
+                  <span class="badge badge-danger">{{ r.severity }}</span>
+                {% else %}
+                  <span class="badge badge-warning">{{ r.severity }}</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+      No system inferences logged yet.
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

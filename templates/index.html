@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block title %}AutoIntel AI - Smart Vehicle Service & Repair Assistant{% endblock %}
+{% block page_title %}Home{% endblock %}
+
+{% block content %}
+<!-- Hero Section with 360° Interactive Vehicle Turntable -->
+<div class="glass-card" style="margin-bottom: 2.25rem; padding: 2.75rem 2.25rem; background: linear-gradient(145deg, rgba(16, 19, 30, 0.95), rgba(9, 10, 16, 0.98)); border-color: rgba(221, 39, 245, 0.25);">
+  <div style="display: grid; grid-template-columns: 1.15fr 1fr; gap: 2.5rem; align-items: center;">
+    
+    <!-- Left Hero Content -->
+    <div>
+      <span class="badge badge-neon" style="margin-bottom: 1rem; font-size: 0.78rem; letter-spacing: 0.8px;">SMART VEHICLE SERVICE ASSISTANT</span>
+      <h1 style="font-size: 2.6rem; font-weight: 900; letter-spacing: -1px; margin-bottom: 1rem; line-height: 1.2; color: #fff;">
+        AI Vehicle Service, Repair & <br>
+        <span style="background: linear-gradient(135deg, #DD27F5, #a855f7, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+          Insurance Intelligence
+        </span>
+      </h1>
+      
+      <p style="color: var(--text-secondary); font-size: 1.05rem; line-height: 1.6; margin-bottom: 2rem;">
+        Smart vehicle analysis for repair cost, service time, diagnosis, parts and insurance insights.
+      </p>
+
+      <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+        <a href="{{ url_for('check_page') }}" class="btn btn-neon" style="font-size: 0.95rem; padding: 0.85rem 2rem;">
+          <span>✨ START VEHICLE ANALYSIS</span>
+        </a>
+        <a href="{{ url_for('vehicles_page') }}" class="btn btn-secondary" style="font-size: 0.95rem; padding: 0.85rem 1.8rem;">
+          <span>🚗 MY VEHICLES</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Right 360° Interactive Car Turntable -->
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <div style="position: relative; width: 100%; display: flex; justify-content: center;">
+        <canvas id="carTurntableCanvas" style="cursor: grab; border-radius: 16px;"></canvas>
+      </div>
+
+      <!-- Turntable Controls -->
+      <div class="car-controls-bar" style="margin-top: 0.75rem;">
+        <span style="font-size: 0.72rem; color: #94a3b8; font-weight: 700;">360° CAR VIEW:</span>
+        <button type="button" id="btn360Pause">⏸ Pause</button>
+        <button type="button" id="btn3601x" class="active">1x Orbit</button>
+        <button type="button" id="btn3602x">2x Orbit</button>
+        <span style="font-size: 0.7rem; color: #64748b; margin-left: 0.25rem;">(Drag left/right to rotate)</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Clear 6-Step User Journey Diagram -->
+<div class="glass-card" style="margin-bottom: 2.25rem; padding: 1.75rem 2rem;">
+  <h2 style="font-size: 1.25rem; font-weight: 800; color: #fff; margin-bottom: 1.25rem; letter-spacing: -0.3px; text-align: center;">
+    🚀 How AutoIntel AI Works in 6 Simple Steps
+  </h2>
+
+  <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.75rem; text-align: center;">
+    <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 10px; padding: 1rem 0.5rem;">
+      <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">🔑</div>
+      <strong style="font-size: 0.8rem; color: #fff; display: block;">1. SIGN IN</strong>
+      <span style="font-size: 0.72rem; color: var(--text-muted);">Secure account</span>
+    </div>
+
+    <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 10px; padding: 1rem 0.5rem;">
+      <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">🚗</div>
+      <strong style="font-size: 0.8rem; color: #fff; display: block;">2. ADD MY CAR</strong>
+      <span style="font-size: 0.72rem; color: var(--text-muted);">Brand & Model</span>
+    </div>
+
+    <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 10px; padding: 1rem 0.5rem;">
+      <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">🔧</div>
+      <strong style="font-size: 0.8rem; color: #fff; display: block;">3. ENTER DETAILS</strong>
+      <span style="font-size: 0.72rem; color: var(--text-muted);">Service or noise</span>
+    </div>
+
+    <div style="background: rgba(221, 39, 245, 0.08); border: 1px solid var(--border-active); border-radius: 10px; padding: 1rem 0.5rem;">
+      <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">✨</div>
+      <strong style="font-size: 0.8rem; color: var(--accent-purple); display: block;">4. ANALYZE</strong>
+      <span style="font-size: 0.72rem; color: var(--text-muted);">One-click AI</span>
+    </div>
+
+    <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 10px; padding: 1rem 0.5rem;">
+      <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">📊</div>
+      <strong style="font-size: 0.8rem; color: #fff; display: block;">5. AI RESULTS</strong>
+      <span style="font-size: 0.72rem; color: var(--text-muted);">Cost & Parts</span>
+    </div>
+
+    <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 10px; padding: 1rem 0.5rem;">
+      <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">📋</div>
+      <strong style="font-size: 0.8rem; color: #fff; display: block;">6. VIEW HISTORY</strong>
+      <span style="font-size: 0.72rem; color: var(--text-muted);">Saved in database</span>
+    </div>
+  </div>
+</div>
+
+<!-- Simple Feature Benefit Cards -->
+<h2 style="font-size: 1.35rem; font-weight: 800; color: #fff; margin-bottom: 1.25rem; letter-spacing: -0.3px;">
+  💡 Intelligent Features for Drivers & Technicians
+</h2>
+
+<div class="grid-3" style="margin-bottom: 2rem;">
+  <div class="glass-card glass-card-neon-top">
+    <div style="font-size: 1.8rem; margin-bottom: 0.6rem;">💰</div>
+    <h3 style="font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 0.4rem;">Repair Cost Prediction</h3>
+    <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.5; margin-bottom: 1rem;">
+      Get instant, transparent dollar estimates for replacement parts and labor before visiting the service shop.
+    </p>
+    <a href="{{ url_for('check_page') }}" style="color: var(--accent-purple); text-decoration: none; font-size: 0.85rem; font-weight: 600;">Calculate Cost &rarr;</a>
+  </div>
+
+  <div class="glass-card glass-card-neon-top">
+    <div style="font-size: 1.8rem; margin-bottom: 0.6rem;">⏱️</div>
+    <h3 style="font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 0.4rem;">Service Time Prediction</h3>
+    <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.5; margin-bottom: 1rem;">
+      Accurately forecasts how many hours your car will occupy the service bay so you can schedule pickup easily.
+    </p>
+    <a href="{{ url_for('check_page') }}" style="color: var(--accent-purple); text-decoration: none; font-size: 0.85rem; font-weight: 600;">Estimate Turnaround &rarr;</a>
+  </div>
+
+  <div class="glass-card glass-card-neon-top">
+    <div style="font-size: 1.8rem; margin-bottom: 0.6rem;">🛡️</div>
+    <h3 style="font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 0.4rem;">Insurance Intelligence</h3>
+    <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.5; margin-bottom: 1rem;">
+      Know upfront whether the repair is covered under warranty/insurance or if it will be an out-of-pocket expense.
+    </p>
+    <a href="{{ url_for('check_page') }}" style="color: var(--accent-purple); text-decoration: none; font-size: 0.85rem; font-weight: 600;">Check Claim Probability &rarr;</a>
+  </div>
+</div>
+
+<div class="grid-2" style="margin-bottom: 2rem;">
+  <div class="glass-card glass-card-neon-top">
+    <div style="font-size: 1.8rem; margin-bottom: 0.6rem;">🔍</div>
+    <h3 style="font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 0.4rem;">Vehicle Diagnosis</h3>
+    <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.5; margin-bottom: 1rem;">
+      Describe unusual noises, dashboard warning lights, or smells in plain English and receive instant root-cause analysis and severity rating.
+    </p>
+    <a href="{{ url_for('check_page') }}" style="color: var(--accent-purple); text-decoration: none; font-size: 0.85rem; font-weight: 600;">Diagnose Symptoms &rarr;</a>
+  </div>
+
+  <div class="glass-card glass-card-neon-top">
+    <div style="font-size: 1.8rem; margin-bottom: 0.6rem;">🧰</div>
+    <h3 style="font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 0.4rem;">Parts Recommendation</h3>
+    <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.5; margin-bottom: 1rem;">
+      Clear distinction between parts that MUST be replaced with new OEM components vs. parts that can be safely repaired or serviced.
+    </p>
+    <a href="{{ url_for('check_page') }}" style="color: var(--accent-purple); text-decoration: none; font-size: 0.85rem; font-weight: 600;">Explore Parts Guidance &rarr;</a>
+  </div>
+</div>
+{% endblock %}

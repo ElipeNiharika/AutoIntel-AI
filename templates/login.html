@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In - AutoIntel AI</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    .auth-page-wrapper {
+      min-height: 100vh;
+      width: 100vw;
+      display: flex;
+      background: #090a10;
+    }
+    .auth-split-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      width: 100vw;
+      min-height: 100vh;
+    }
+    .auth-branding-panel {
+      background: linear-gradient(145deg, #0e111a, #07080d);
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 3.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+    .auth-branding-panel::before {
+      content: "";
+      position: absolute;
+      top: -100px;
+      left: -100px;
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(221, 39, 245, 0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .auth-form-panel {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+      background: #090a10;
+    }
+    .auth-card {
+      width: 100%;
+      max-width: 420px;
+      background: rgba(18, 21, 32, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 2.5rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      position: relative;
+    }
+    .auth-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #DD27F5, #38bdf8);
+      border-radius: 16px 16px 0 0;
+    }
+    @media (max-width: 900px) {
+      .auth-split-grid {
+        grid-template-columns: 1fr;
+      }
+      .auth-branding-panel {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-page-wrapper">
+    <div class="auth-split-grid">
+      
+      <!-- LEFT SIDE: Clean Pure Automotive 360° Visual UI -->
+      <div class="auth-branding-panel">
+        <div style="margin-bottom: 1.5rem;">
+          <div style="display: inline-flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
+            <div class="brand-logo-icon" style="width: 42px; height: 42px; font-size: 1.3rem;">🚗</div>
+            <div style="text-align: left;">
+              <div class="brand-title" style="font-size: 1.4rem;">Auto<span>Intel AI</span></div>
+              <div style="font-size: 0.72rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Vehicle Intelligence</div>
+            </div>
+          </div>
+          <h1 style="font-size: 2.2rem; font-weight: 900; line-height: 1.2; color: #fff; margin-bottom: 0.5rem; letter-spacing: -0.5px;">
+            Smart Vehicle Assistant
+          </h1>
+          <p style="color: #94a3b8; font-size: 0.95rem;">
+            Your vehicle. Smarter decisions.
+          </p>
+        </div>
+
+        <!-- 360 Turntable Visual UI -->
+        <div style="display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 480px;">
+          <canvas id="carTurntableCanvas" style="border-radius: 16px; max-width: 100%;"></canvas>
+        </div>
+      </div>
+
+      <!-- RIGHT SIDE: Clean Premium Sign In Card -->
+      <div class="auth-form-panel">
+        <div class="auth-card">
+          
+          <!-- Flash Messages -->
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              <div style="margin-bottom: 1.25rem;">
+                {% for category, message in messages %}
+                  <div class="alert alert-{{ category }}" style="font-size: 0.85rem; padding: 0.65rem 0.9rem;">
+                    <span>{{ message }}</span>
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% endwith %}
+
+          <div style="margin-bottom: 1.75rem;">
+            <h2 style="font-size: 1.6rem; font-weight: 800; color: #fff; letter-spacing: -0.4px;">Welcome Back 👋</h2>
+            <p style="color: #94a3b8; font-size: 0.88rem; margin-top: 0.35rem;">Sign in to continue to your vehicle assistant.</p>
+          </div>
+
+          <form method="POST" action="{{ url_for('login') }}">
+            <div class="form-group">
+              <label class="form-label">Email Address</label>
+              <input type="email" name="email" id="loginEmail" class="form-control" placeholder="name@example.com" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <div style="position: relative;">
+                <input type="password" name="password" id="loginPassword" class="form-control" placeholder="••••••••" required style="padding-right: 2.5rem;">
+                <button type="button" onclick="togglePasswordVisibility()" title="Show/Hide Password" style="position: absolute; right: 0.8rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 1rem;">👁️</button>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; font-size: 0.82rem;">
+              <label style="display: flex; align-items: center; gap: 0.4rem; color: #cbd5e1; cursor: pointer;">
+                <input type="checkbox" name="remember" style="accent-color: #DD27F5;"> Remember me
+              </label>
+              <a href="{{ url_for('forgot_password') }}" style="color: #38bdf8; text-decoration: none; font-weight: 600;">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="btn btn-neon btn-block" style="padding: 0.85rem; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.4px;">
+              SIGN IN
+            </button>
+          </form>
+
+          <div style="margin-top: 1.75rem; text-align: center;">
+            <p style="font-size: 0.88rem; color: #94a3b8;">
+              Don't have an account? <a href="{{ url_for('register') }}" style="color: #DD27F5; text-decoration: none; font-weight: 700;">Create Account</a>
+            </p>
+          </div>
+
+          <div style="margin-top: 1.25rem; text-align: center;">
+            <a href="{{ url_for('index') }}" style="color: #64748b; font-size: 0.8rem; text-decoration: none;">&larr; Return to Home Page</a>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/car360.js') }}"></script>
+  <script>
+  function togglePasswordVisibility() {
+    const pwd = document.getElementById("loginPassword");
+    pwd.type = pwd.type === "password" ? "text" : "password";
+  }
+  </script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block title %}My Dashboard - AutoIntel AI{% endblock %}
+{% block page_title %}My Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">📊 Welcome back, <span>{{ session.get('user_name', 'Driver') }}</span>!</h1>
+    <p class="page-subtitle">Overview of your vehicles, health checks, recent cost estimates, and maintenance schedules.</p>
+  </div>
+  <div style="display: flex; gap: 0.75rem;">
+    <a href="{{ url_for('check_page') }}" class="btn btn-neon">✨ Start New Check</a>
+    <a href="{{ url_for('add_vehicle_page') }}" class="btn btn-secondary">+ Add Vehicle</a>
+  </div>
+</div>
+
+<!-- Top KPI Overview -->
+<div class="grid-4" style="margin-bottom: 2rem;">
+  <div class="kpi-card">
+    <span class="kpi-title">My Total Checks</span>
+    <div class="kpi-value" id="kpiTotal">0</div>
+    <span class="kpi-subtitle">Analysis Workorders</span>
+  </div>
+
+  <div class="kpi-card">
+    <span class="kpi-title">Average Estimated Cost</span>
+    <div class="kpi-value" id="kpiAvgCost">$0.00</div>
+    <span class="kpi-subtitle">Mean Service Estimate</span>
+  </div>
+
+  <div class="kpi-card">
+    <span class="kpi-title">Average Turnaround Time</span>
+    <div class="kpi-value" id="kpiAvgTime" style="color: var(--accent-emerald);">0.0 hrs</div>
+    <span class="kpi-subtitle">Service Bay Duration</span>
+  </div>
+
+  <div class="kpi-card">
+    <span class="kpi-title">Insurance Coverage %</span>
+    <div class="kpi-value" id="kpiInsPct" style="color: var(--accent-purple);">0.0%</div>
+    <span class="kpi-subtitle">Covered Repairs</span>
+  </div>
+</div>
+
+<!-- Visual Telemetry Charts -->
+<div class="grid-2" style="margin-bottom: 2rem;">
+  <div class="glass-card glass-card-neon-top">
+    <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">
+      🔍 Problem Subsystem Distribution
+    </h3>
+    <div style="position: relative; height: 260px; display: flex; justify-content: center;">
+      <canvas id="chartCategories"></canvas>
+    </div>
+  </div>
+
+  <div class="glass-card glass-card-neon-top">
+    <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">
+      🛠️ Service Types Requested
+    </h3>
+    <div style="position: relative; height: 260px;">
+      <canvas id="chartServices"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Checks & Registered Vehicles Grid -->
+<div class="glass-card" style="margin-bottom: 2rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+    <div>
+      <h3 style="font-size: 1.15rem; font-weight: 800; color: #fff;">
+        🚗 My Recent Vehicle Checks
+      </h3>
+      <p style="color: var(--text-muted); font-size: 0.82rem; margin-top: 0.2rem;">Live diagnostic inspections and cost predictions recorded for your account.</p>
+    </div>
+    <div style="display: flex; gap: 0.5rem;">
+      <a href="{{ url_for('check_page') }}" class="btn btn-neon" style="font-size: 0.85rem; padding: 0.45rem 0.9rem;">✨ New Check</a>
+      <a href="{{ url_for('history_page') }}" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.45rem 0.9rem;">📋 Full History &rarr;</a>
+    </div>
+  </div>
+
+  {% if recent_checks %}
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Check ID</th>
+            <th>Date</th>
+            <th>Vehicle</th>
+            <th>Service Requested</th>
+            <th>Estimated Cost</th>
+            <th>Turnaround</th>
+            <th>Insurance Status</th>
+            <th>Severity</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in recent_checks %}
+            <tr>
+              <td><strong style="color: var(--accent-purple);">#{{ r.id }}</strong></td>
+              <td>{{ r.created_at.strftime('%Y-%m-%d %H:%M') if r.created_at else 'Recent' }}</td>
+              <td><strong>{{ r.vehicle_info }}</strong></td>
+              <td>{{ r.service_type }}</td>
+              <td style="color: var(--accent-purple); font-weight: 700;">${{ "%.2f"|format(r.predicted_cost) }}</td>
+              <td>{{ "%.1f"|format(r.predicted_time) }} hrs</td>
+              <td>
+                {% if r.predicted_insurance_claim == 1 %}
+                  <span class="badge badge-success">Covered</span>
+                {% else %}
+                  <span class="badge badge-warning">Direct</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if r.severity in ['High', 'Critical'] %}
+                  <span class="badge badge-danger">{{ r.severity }}</span>
+                {% else %}
+                  <span class="badge badge-warning">{{ r.severity }}</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div style="text-align: center; padding: 2.5rem 1rem; color: var(--text-muted);">
+      <p style="font-size: 1.1rem; margin-bottom: 0.5rem;">🚗 No vehicle checks recorded yet.</p>
+      <p style="font-size: 0.85rem; margin-bottom: 1.25rem;">Run your first vehicle check to see cost estimates, repair times, and parts recommendations here.</p>
+      <a href="{{ url_for('check_page') }}" class="btn btn-neon" style="padding: 0.7rem 1.75rem;">✨ Start Vehicle Check</a>
+    </div>
+  {% endif %}
+</div>
+
+<!-- Quick Navigation Banner -->
+<div class="glass-card" style="background: linear-gradient(135deg, rgba(221, 39, 245, 0.1), rgba(56, 189, 248, 0.05)); border-color: rgba(221, 39, 245, 0.25); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+  <div>
+    <h3 style="font-size: 1.15rem; font-weight: 800; color: #fff;">Need to diagnose a strange sound or warning light?</h3>
+    <p style="color: var(--text-secondary); font-size: 0.88rem; margin-top: 0.25rem;">Run our AI Assistant to get instant cost, time, and replacement parts recommendations.</p>
+  </div>
+  <a href="{{ url_for('check_page') }}" class="btn btn-neon" style="padding: 0.8rem 1.8rem;">✨ Launch Vehicle Analysis</a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

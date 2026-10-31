@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+{% block title %}Unified Multi-Model Predictor - AutoIntel AI{% endblock %}
+{% block page_title %}Unified Predictor (Modules 2, 3, 4, 5, 6){% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">⚡ Unified <span>Multi-Target</span> AI Prediction Suite</h1>
+    <p class="page-subtitle">Simultaneously compute Repair Cost ($), Turnaround Time (Hours), and Insurance Claim Approval (%)</p>
+  </div>
+  <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+    <button type="button" class="btn btn-secondary" onclick="fillDemoData('brake')">⚡ Demo: Brake Service</button>
+    <button type="button" class="btn btn-secondary" onclick="fillDemoData('engine')">⚡ Demo: Engine Overhaul</button>
+  </div>
+</div>
+
+<form id="predictForm">
+  <!-- Vertically Stacked Single-Column Layout: Module 2 on Top, Module 3 Directly Below -->
+  <div style="display: flex; flex-direction: column; gap: 1.75rem;">
+    
+    <!-- Module 2: Vehicle Specifications -->
+    <div class="glass-card glass-card-neon-top">
+      <h3 style="font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+        <span>🚘</span> <span>Module 2: Vehicle Specifications</span>
+      </h3>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Brand / Make</label>
+          <select name="brand" id="brandSelect" class="form-control" required>
+            <option value="">-- Select Brand --</option>
+            {% for b in metadata.get('brands', ['Toyota', 'Honda', 'Ford', 'BMW', 'Mercedes-Benz', 'Hyundai', 'Nissan', 'Chevrolet']) %}
+              <option value="{{ b }}">{{ b }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Vehicle Model</label>
+          <select name="model" id="modelSelect" class="form-control" required>
+            <option value="">-- Select Brand First --</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Body / Vehicle Type</label>
+          <select name="vehicle_type" id="vehicleType" class="form-control" required>
+            {% for vt in metadata.get('vehicle_types', ['Sedan', 'SUV', 'Truck', 'Coupe', 'Hatchback', 'Van']) %}
+              <option value="{{ vt }}">{{ vt }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Fuel Type</label>
+          <select name="fuel_type" class="form-control">
+            {% for ft in metadata.get('fuel_types', ['Petrol', 'Diesel', 'Electric', 'Hybrid', 'CNG']) %}
+              <option value="{{ ft }}">{{ ft }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Transmission</label>
+          <select name="transmission" class="form-control">
+            {% for tr in metadata.get('transmissions', ['Automatic', 'Manual']) %}
+              <option value="{{ tr }}">{{ tr }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Manufacturing Year</label>
+          <input type="number" name="manufacturing_year" class="form-control" value="2020" min="1990" max="2026">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Mileage at Service (Miles)</label>
+        <input type="number" name="mileage" id="mileage" class="form-control" value="35000" min="0" required>
+      </div>
+    </div>
+
+    <!-- Module 3: Service & Operational Details (Directly Below Module 2) -->
+    <div class="glass-card glass-card-neon-top">
+      <h3 style="font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+        <span>🔧</span> <span>Module 3: Service & Workorder Details</span>
+      </h3>
+
+      <div class="form-group">
+        <label class="form-label">Service Type</label>
+        <select name="service_type" id="serviceType" class="form-control" required>
+          {% for st in metadata.get('service_types', ['Routine Maintenance', 'Brake System Service', 'Transmission Repair', 'Engine Diagnostics & Tune-up', 'Emergency Towing & Repair']) %}
+            <option value="{{ st }}">{{ st }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Estimated Baseline Cost ($)</label>
+          <input type="number" step="0.01" name="estimated_cost" id="estimatedCost" class="form-control" value="250.00" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Urgency Level</label>
+          <select name="urgency_level" id="urgencyLevel" class="form-control">
+            {% for ul in metadata.get('urgency_levels', ['Low', 'Normal', 'High', 'Critical Emergency']) %}
+              <option value="{{ ul }}" {% if ul == 'Normal' %}selected{% endif %}>{{ ul }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Customer Tier</label>
+          <select name="customer_type" class="form-control">
+            {% for ct in metadata.get('customer_types', ['Individual Owner', 'Commercial Fleet', 'Rideshare Driver']) %}
+              <option value="{{ ct }}">{{ ct }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Warranty Coverage</label>
+          <select name="warranty_info" class="form-control">
+            {% for wt in metadata.get('warranty_options', ['Standard Factory Warranty', 'Extended Coverage', 'Expired / No Warranty']) %}
+              <option value="{{ wt }}">{{ wt }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Technician Rating (1 - 5)</label>
+          <input type="number" step="0.1" name="technician_rating" class="form-control" value="4.8" min="1" max="5">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tow Distance (Miles)</label>
+          <input type="number" step="0.1" name="tow_distance" class="form-control" value="0.0" min="0">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Itemized Parts Used (Comma-Separated)</label>
+        <input type="text" name="parts_used" id="partsUsed" class="form-control" placeholder="e.g. brake pads, oil filter, battery">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Service Description / Symptom Notes</label>
+        <textarea name="service_description" id="serviceDescription" class="form-control" placeholder="Describe customer symptoms or mechanic observations..."></textarea>
+      </div>
+
+      <button type="submit" id="btnSubmitPredict" class="btn btn-neon btn-block" style="font-size: 1.05rem; padding: 0.9rem 2rem; margin-top: 0.75rem;">
+        <span>⚡ Generate Multi-Model Predictions</span>
+      </button>
+    </div>
+
+  </div>
+</form>
+
+<!-- Prediction Output Results Card (Modules 4, 5, 6) -->
+<div id="predictionResultBox" class="result-box" style="margin-top: 2rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+    <div>
+      <span class="badge badge-neon" style="font-size: 0.8rem;">Multi-Target Inference Complete</span>
+      <h2 style="font-size: 1.4rem; font-weight: 800; color: #fff; margin-top: 0.25rem;">Multi-Target AI Estimation Summary</h2>
+    </div>
+    <div>
+      <a href="{{ url_for('history_page') }}" class="btn btn-secondary" style="font-size: 0.85rem;">View in Audit History &rarr;</a>
+    </div>
+  </div>
+
+  <div class="grid-3">
+    <!-- Module 4: Repair Cost -->
+    <div class="glass-card" style="background: rgba(14, 14, 20, 0.9); border-color: var(--border-glow);">
+      <p style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">Module 4: Total Repair Cost</p>
+      <div id="resCost" class="metric-highlight" style="margin: 0.5rem 0;">$0.00</div>
+      <p style="font-size: 0.8rem; color: var(--text-muted);">
+        Est. Variance: <strong id="resVariance" style="color: var(--accent-emerald);">$0.00</strong>
+      </p>
+    </div>
+
+    <!-- Module 5: Repair Time -->
+    <div class="glass-card" style="background: rgba(14, 14, 20, 0.9);">
+      <p style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">Module 5: Turnaround Duration</p>
+      <div id="resTime" class="metric-highlight" style="color: var(--accent-emerald); margin: 0.5rem 0;">0.0 hrs</div>
+      <p style="font-size: 0.8rem; color: var(--text-muted);">Service bay scheduling estimate</p>
+    </div>
+
+    <!-- Module 6: Insurance Claim Scoring -->
+    <div class="glass-card" style="background: rgba(14, 14, 20, 0.9);">
+      <p style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">Module 6: Insurance Claim Status</p>
+      <div style="margin: 0.75rem 0;">
+        <span id="resInsuranceBadge" class="badge badge-neon" style="font-size: 0.9rem; padding: 0.35rem 0.8rem;">Eligible</span>
+      </div>
+      <div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.25rem;">
+          <span>Coverage Probability</span>
+          <strong id="resProbability">0%</strong>
+        </div>
+        <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
+          <div id="resProbBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #DD27F5, #7928CA); transition: width 0.6s ease-in-out;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

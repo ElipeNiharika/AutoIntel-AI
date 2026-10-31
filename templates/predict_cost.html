@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block title %}Repair Cost Predictor - AutoIntel AI{% endblock %}
+{% block page_title %}Repair Cost Predictor (Module 4){% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">💰 Dedicated <span>Repair Cost</span> Prediction Engine</h1>
+    <p class="page-subtitle">Module 4: High-Precision Linear Regression & Tree Ensemble Estimator ($R^2 = 0.9942$)</p>
+  </div>
+  <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+    <button type="button" class="btn btn-secondary" onclick="fillDemoData('brake')">⚡ Scenario: Brake Overhaul</button>
+    <button type="button" class="btn btn-secondary" onclick="fillDemoData('engine')">⚡ Scenario: Engine Service</button>
+  </div>
+</div>
+
+<form id="predictForm">
+  <div style="display: flex; flex-direction: column; gap: 1.75rem;">
+    <!-- Vehicle & Service Inputs -->
+    <div class="glass-card glass-card-neon-top">
+      <h3 style="font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">
+        🚘 Vehicle Specifications
+      </h3>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Brand / Make</label>
+          <select name="brand" id="brandSelect" class="form-control" required>
+            <option value="">-- Select Brand --</option>
+            {% for b in metadata.get('brands', ['Toyota', 'Honda', 'Ford', 'BMW', 'Mercedes-Benz', 'Hyundai']) %}
+              <option value="{{ b }}">{{ b }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Vehicle Model</label>
+          <select name="model" id="modelSelect" class="form-control" required>
+            <option value="">-- Select Brand First --</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Vehicle Type</label>
+          <select name="vehicle_type" id="vehicleType" class="form-control" required>
+            {% for vt in metadata.get('vehicle_types', ['Sedan', 'SUV', 'Truck', 'Coupe', 'Hatchback']) %}
+              <option value="{{ vt }}">{{ vt }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Mileage (Miles)</label>
+          <input type="number" name="mileage" id="mileage" class="form-control" value="42000" min="0" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Customer Tier</label>
+        <select name="customer_type" class="form-control">
+          {% for ct in metadata.get('customer_types', ['Individual Owner', 'Commercial Fleet', 'Rideshare Driver']) %}
+            <option value="{{ ct }}">{{ ct }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <!-- Cost Parameters -->
+    <div class="glass-card glass-card-neon-top">
+      <h3 style="font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">
+        🔧 Service & Parts Configuration
+      </h3>
+
+      <div class="form-group">
+        <label class="form-label">Service Type</label>
+        <select name="service_type" id="serviceType" class="form-control" required>
+          {% for st in metadata.get('service_types', ['Brake System Service', 'Routine Maintenance', 'Transmission Repair', 'Engine Diagnostics & Tune-up']) %}
+            <option value="{{ st }}">{{ st }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Shop Baseline Estimate ($)</label>
+          <input type="number" step="0.01" name="estimated_cost" id="estimatedCost" class="form-control" value="260.00" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Urgency Level</label>
+          <select name="urgency_level" id="urgencyLevel" class="form-control">
+            <option value="Low">Low</option>
+            <option value="Normal" selected>Normal</option>
+            <option value="High">High</option>
+            <option value="Critical Emergency">Critical Emergency</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Parts Used (Comma-Separated)</label>
+        <input type="text" name="parts_used" id="partsUsed" class="form-control" placeholder="e.g. brake pads, brake rotor, oil filter" value="brake pads, oil filter">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Service Notes</label>
+        <textarea name="service_description" id="serviceDescription" class="form-control" placeholder="Mechanic notes...">Front axle brake pads replacement and routine oil filter renewal.</textarea>
+      </div>
+
+      <button type="submit" id="btnSubmitPredict" class="btn btn-neon btn-block" style="padding: 0.85rem; margin-top: 0.75rem;">
+        <span>💰 Calculate AI Repair Cost</span>
+      </button>
+    </div>
+  </div>
+</form>
+
+<!-- Dedicated Cost Result -->
+<div id="predictionResultBox" class="result-box">
+  <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.25rem;">
+    <div>
+      <span class="badge badge-neon">Inference Generated</span>
+      <h2 style="font-size: 1.4rem; font-weight: 800; color: #fff; margin-top: 0.25rem;">Predicted Total Workorder Cost</h2>
+    </div>
+    <a href="{{ url_for('history_page') }}" class="btn btn-secondary" style="font-size: 0.8rem;">View in History &rarr;</a>
+  </div>
+
+  <div class="grid-3">
+    <div class="glass-card" style="text-align: center; border-color: var(--border-glow);">
+      <p style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">AI Forecasted Total</p>
+      <div id="resCost" class="metric-highlight" style="font-size: 2.8rem; margin: 0.5rem 0;">$0.00</div>
+      <p style="font-size: 0.8rem; color: #a1a1aa;">Calibrated with LinReg/XGBoost</p>
+    </div>
+
+    <div class="glass-card" style="text-align: center;">
+      <p style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">Estimated Variance</p>
+      <div id="resVariance" class="metric-highlight" style="color: var(--accent-emerald); font-size: 2.2rem; margin: 0.5rem 0;">$0.00</div>
+      <p style="font-size: 0.8rem; color: var(--text-muted);">Baseline vs Predicted delta</p>
+    </div>
+
+    <div class="glass-card" style="text-align: center;">
+      <p style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">Duration & Claim Cross-Check</p>
+      <div id="resTime" style="font-size: 1.6rem; font-weight: 800; color: #fff; margin: 0.4rem 0;">0.0 hrs</div>
+      <div><span id="resInsuranceBadge" class="badge badge-neon">Claim Status</span></div>
+    </div>
+  </div>
+</div>
+{% endblock %}

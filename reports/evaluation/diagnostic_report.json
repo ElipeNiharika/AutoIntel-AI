@@ -1,0 +1,11 @@
+{
+  "accuracy": 0.909,
+  "classes": [
+    "Battery",
+    "Brakes",
+    "Electrical",
+    "Engine",
+    "Transmission"
+  ],
+  "sample_test_size": 2000
+}

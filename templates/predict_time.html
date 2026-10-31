@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}Turnaround Time Predictor - AutoIntel AI{% endblock %}
+{% block page_title %}Turnaround Duration Predictor (Module 5){% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">⏱️ Dedicated <span>Turnaround Duration</span> Prediction Engine</h1>
+    <p class="page-subtitle">Module 5: Machine Learning Service Bay Hours & Dispatch Estimator (MAE = 1.18 hrs)</p>
+  </div>
+</div>
+
+<form id="predictForm">
+  <div style="display: flex; flex-direction: column; gap: 1.75rem;">
+    <div class="glass-card glass-card-neon-top">
+      <h3 style="font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">
+        🚘 Vehicle & Technician Specs
+      </h3>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Brand / Make</label>
+          <select name="brand" id="brandSelect" class="form-control" required>
+            <option value="">-- Select Brand --</option>
+            {% for b in metadata.get('brands', ['Toyota', 'Honda', 'Ford', 'BMW', 'Hyundai']) %}
+              <option value="{{ b }}">{{ b }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Model</label>
+          <select name="model" id="modelSelect" class="form-control" required>
+            <option value="">-- Select Brand First --</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Vehicle Type</label>
+          <select name="vehicle_type" id="vehicleType" class="form-control">
+            <option value="Sedan">Sedan</option>
+            <option value="SUV">SUV</option>
+            <option value="Truck">Truck</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Mileage</label>
+          <input type="number" name="mileage" id="mileage" class="form-control" value="55000">
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Technician Rating (1 - 5)</label>
+          <input type="number" step="0.1" name="technician_rating" class="form-control" value="4.8" min="1" max="5">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tow Distance (Miles)</label>
+          <input type="number" step="0.1" name="tow_distance" class="form-control" value="0.0">
+        </div>
+      </div>
+    </div>
+
+    <div class="glass-card glass-card-neon-top">
+      <h3 style="font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">
+        🛠️ Workorder Scope & Complexity
+      </h3>
+
+      <div class="form-group">
+        <label class="form-label">Service Type</label>
+        <select name="service_type" id="serviceType" class="form-control" required>
+          <option value="Routine Maintenance">Routine Maintenance (Fast Lane)</option>
+          <option value="Brake System Service">Brake System Service</option>
+          <option value="Transmission Repair">Transmission Repair (Heavy Overhaul)</option>
+          <option value="Engine Diagnostics & Tune-up">Engine Diagnostics & Tune-up</option>
+          <option value="Emergency Towing & Repair">Emergency Towing & Repair</option>
+        </select>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Estimated Cost ($)</label>
+          <input type="number" step="0.01" name="estimated_cost" id="estimatedCost" class="form-control" value="320.00">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Urgency Level</label>
+          <select name="urgency_level" id="urgencyLevel" class="form-control">
+            <option value="Low">Low</option>
+            <option value="Normal" selected>Normal</option>
+            <option value="High">High</option>
+            <option value="Critical Emergency">Critical Emergency</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Parts Requiring Disassembly / Replacement</label>
+        <input type="text" name="parts_used" id="partsUsed" class="form-control" value="transmission fluid, filter kit, gasket">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Workorder Notes</label>
+        <textarea name="service_description" id="serviceDescription" class="form-control">Transmission slipping and gear shift delay investigation.</textarea>
+      </div>
+
+      <button type="submit" id="btnSubmitPredict" class="btn btn-neon btn-block" style="padding: 0.85rem; margin-top: 0.75rem;">
+        <span>⏱️ Compute Service Bay Turnaround Hours</span>
+      </button>
+    </div>
+  </div>
+</form>
+
+<div id="predictionResultBox" class="result-box">
+  <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.25rem;">
+    <div>
+      <span class="badge badge-neon">Scheduling Estimate Generated</span>
+      <h2 style="font-size: 1.4rem; font-weight: 800; color: #fff; margin-top: 0.25rem;">Estimated Service Turnaround Time</h2>
+    </div>
+  </div>
+
+  <div class="grid-3">
+    <div class="glass-card" style="text-align: center; border-color: var(--border-glow);">
+      <p style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">Forecasted Bay Duration</p>
+      <div id="resTime" class="metric-highlight" style="font-size: 2.8rem; margin: 0.5rem 0; color: var(--accent-emerald);">0.0 hrs</div>
+      <p style="font-size: 0.8rem; color: #a1a1aa;">Estimated bay occupancy</p>
+    </div>
+
+    <div class="glass-card" style="text-align: center;">
+      <p style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">Corresponding Repair Cost</p>
+      <div id="resCost" class="metric-highlight" style="font-size: 2.2rem; margin: 0.5rem 0;">$0.00</div>
+      <p style="font-size: 0.8rem; color: var(--text-muted);">Estimated labor + parts total</p>
+    </div>
+
+    <div class="glass-card" style="text-align: center;">
+      <p style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">Insurance Status</p>
+      <div style="margin: 0.5rem 0;"><span id="resInsuranceBadge" class="badge badge-neon" style="font-size: 0.9rem;">Status</span></div>
+      <p id="resProbability" style="font-size: 0.8rem; color: var(--text-muted);">0% Probability</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

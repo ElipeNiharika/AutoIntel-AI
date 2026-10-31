@@ -1,0 +1,98 @@
+{
+  "Repair_Cost_Prediction": {
+    "LinearRegression": {
+      "MAE": 18.4994,
+      "MSE": 981.8729,
+      "RMSE": 31.3349,
+      "R2_Score": 0.9942
+    },
+    "RandomForest": {
+      "MAE": 18.7379,
+      "MSE": 1037.3203,
+      "RMSE": 32.2075,
+      "R2_Score": 0.9938
+    },
+    "XGBoost": {
+      "MAE": 18.5643,
+      "MSE": 1067.9508,
+      "RMSE": 32.6795,
+      "R2_Score": 0.9936
+    },
+    "Best_Model": "LinearRegression"
+  },
+  "Repair_Time_Prediction": {
+    "LinearRegression": {
+      "MAE": 1.1751,
+      "MSE": 2.1047,
+      "RMSE": 1.4508,
+      "R2_Score": -0.0008
+    },
+    "RandomForest": {
+      "MAE": 1.1775,
+      "MSE": 2.1142,
+      "RMSE": 1.454,
+      "R2_Score": -0.0053
+    },
+    "XGBoost": {
+      "MAE": 1.1816,
+      "MSE": 2.1295,
+      "RMSE": 1.4593,
+      "R2_Score": -0.0126
+    },
+    "Best_Model": "LinearRegression"
+  },
+  "Insurance_Claim_Prediction": {
+    "LogisticRegression": {
+      "Accuracy": 0.5731,
+      "Precision": 0.5006,
+      "Recall": 0.4585,
+      "F1_Score": 0.4786,
+      "Confusion_Matrix": [
+        [
+          5658,
+          2932
+        ],
+        [
+          3471,
+          2939
+        ]
+      ],
+      "ROC_AUC": 0.6268
+    },
+    "RandomForest": {
+      "Accuracy": 0.5695,
+      "Precision": 0.4964,
+      "Recall": 0.5002,
+      "F1_Score": 0.4983,
+      "Confusion_Matrix": [
+        [
+          5337,
+          3253
+        ],
+        [
+          3204,
+          3206
+        ]
+      ],
+      "ROC_AUC": 0.6231
+    },
+    "XGBoost": {
+      "Accuracy": 0.5707,
+      "Precision": 0.4977,
+      "Recall": 0.5069,
+      "F1_Score": 0.5022,
+      "Confusion_Matrix": [
+        [
+          5311,
+          3279
+        ],
+        [
+          3161,
+          3249
+        ]
+      ],
+      "ROC_AUC": 0.6261
+    },
+    "Best_Model": "XGBoost"
+  }
+}
